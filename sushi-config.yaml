@@ -3,18 +3,18 @@
 # │  used properties are included. For a list of all supported properties and their functions,     │
 # │  see: https://fshschool.org/docs/sushi/configuration/.                                         │
 # ╰────────────────────────────────────────────────────────────────────────────────────────────────╯
-id: uz.dhp.core.hackathon.1
-canonical: https://dhp.uz/fhir/core/hackathon/1
-name: DHPHackathon1
-# title: Example Title
-# description: Example Implementation Guide for getting started with SUSHI
+id: uz.dhp.core.connectathon.1
+canonical: https://dhp.uz/fhir/core/connectathon/1
+name: DHPConnectathon1
+title: DHP Connectathon 1
+description: DHP's first connectathon, focusing on MSM and MDM capabilities.
 status: draft # draft | active | retired | unknown
 version: 0.1.0
 fhirVersion: 5.0.0 # https://www.hl7.org/fhir/valueset-FHIR-version.html
 copyrightYear: 2025+
 releaseLabel: ci-build
 license: CC0-1.0 # https://www.hl7.org/fhir/valueset-spdx-license.html
-# jurisdiction: urn:iso:std:iso:3166#US "United States of America" # https://www.hl7.org/fhir/valueset-jurisdiction.html
+jurisdiction: urn:iso:std:iso:3166#UZ "Uzbekistan"
 publisher:
   name: Uzinfocom LLC
   url: https://uzinfocom.uz
@@ -86,6 +86,7 @@ menu:
   Home: index.html
   Artifacts: artifacts.html
   Organization management: organization-management.html
+  Practitioner management: practitioner-practitionerrole-management.html
 
 # ╭───────────────────────────Less Common Implementation Guide Properties──────────────────────────╮
 # │  Uncomment the properties below to configure additional properties on the ImplementationGuide  │
