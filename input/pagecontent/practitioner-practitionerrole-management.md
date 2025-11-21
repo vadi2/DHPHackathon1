@@ -394,8 +394,8 @@ All supported search parameters can be found in the capability statement at [DHP
 | `name` | string | Search by name (partial match) | `?name=Karimov` |
 | `given` | string | Search by given name | `?given=Alisher` |
 | `family` | string | Search by family name | `?family=Karimov` |
-| `telecom` | token | Search by contact details | `?telecom=+998901234567` |
-| `phone` | token | Search by phone number | `?phone=901234567` |
+| `telecom` | token | Search by contact details | `?telecom=%2B998901234567` |
+| `phone` | token | Search by phone number | `?phone=%2B998901234567` |
 | `email` | token | Search by email | `?email=doctor@example.com` |
 | `address` | string | Search by address | `?address=Toshkent` |
 | `address-city` | string | Search by city | `?address-city=Toshkent` |
@@ -423,8 +423,8 @@ All supported search parameters can be found in the capability statement at [DHP
 | `date` | date | Search by period | `?date=2024` |
 | `service` | reference | Search by service | `?service=HealthcareService/202` |
 | `endpoint` | reference | Search by endpoint | `?endpoint=Endpoint/303` |
-| `telecom` | token | Search by contact | `?telecom=phone\|+998901234567` |
-| `phone` | token | Search by phone | `?phone=901234567` |
+| `telecom` | token | Search by contact | `?telecom=phone\|%2B998901234567` |
+| `phone` | token | Search by phone | `?phone=%2B998901234567` |
 
 ### Common search patterns
 

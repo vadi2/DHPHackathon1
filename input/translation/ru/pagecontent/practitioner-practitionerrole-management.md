@@ -394,8 +394,8 @@ Content-Type: application/fhir+json
 | `name` | string | Поиск по имени (частичное совпадение) | `?name=Каримов` |
 | `given` | string | Поиск по имени | `?given=Алишер` |
 | `family` | string | Поиск по фамилии | `?family=Каримов` |
-| `telecom` | token | Поиск по контактным данным | `?telecom=+998901234567` |
-| `phone` | token | Поиск по номеру телефона | `?phone=901234567` |
+| `telecom` | token | Поиск по контактным данным | `?telecom=%2B998901234567` |
+| `phone` | token | Поиск по номеру телефона | `?phone=%2B998901234567` |
 | `email` | token | Поиск по email | `?email=doctor@example.com` |
 | `address` | string | Поиск по адресу | `?address=Toshkent` |
 | `address-city` | string | Поиск по городу | `?address-city=Toshkent` |
@@ -423,8 +423,8 @@ Content-Type: application/fhir+json
 | `date` | date | Поиск по периоду | `?date=2024` |
 | `service` | reference | Поиск по услуге | `?service=HealthcareService/202` |
 | `endpoint` | reference | Поиск по endpoint | `?endpoint=Endpoint/303` |
-| `telecom` | token | Поиск по контакту | `?telecom=phone\|+998901234567` |
-| `phone` | token | Поиск по телефону | `?phone=901234567` |
+| `telecom` | token | Поиск по контакту | `?telecom=phone\|%2B998901234567` |
+| `phone` | token | Поиск по телефону | `?phone=%2B998901234567` |
 
 ### Распространенные шаблоны поиска
 
