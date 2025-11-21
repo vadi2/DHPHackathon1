@@ -2,12 +2,12 @@
 
 ## Обзор
 
-**Цель**: Получение существующих организаций и подразделений, их интеграция в программное обеспечение, обновление и создание по мере необходимости.
+Цель: Получение существующих организаций и подразделений, их интеграция в программное обеспечение, обновление и создание по мере необходимости.
 
-**Ресурсы**: Organization
-**Навыки**: GET/POST/PUT/DELETE операции, поиск, ссылки, идентификаторы
-**Базовый URL**: `https://playground.dhp.uz/fhir`
-**Профиль**: [uz-core-organization](https://dhp.uz/fhir/core/en/StructureDefinition-uz-core-organization.html)
+- Ресурсы: Organization
+- Навыки: GET/POST/PUT/DELETE операции, поиск, ссылки, идентификаторы
+- Базовый URL: `https://playground.dhp.uz/fhir`
+- Профиль: [uz-core-organization](https://dhp.uz/fhir/core/en/StructureDefinition-uz-core-organization.html)
 
 ## Профиль uz-core-organization
 
@@ -20,36 +20,33 @@
 Для добавления переводов названия на русский и каракалпакский языки используйте стандартное расширение [translation](http://hl7.org/fhir/R5/extension-translation.html). Расширение применяется к элементу `_name`:
 
 ```json
-"name": "Toshkent viloyati yuqumli kasalliklar shifoxonasi",
-"_name": {
-  "extension": [
-    {
-      "extension": [
-        {
-          "url": "lang",
-          "valueCode": "ru"
-        },
-        {
-          "url": "content",
-          "valueString": "Ташкентская областная инфекционная больница"
-        }
-      ],
-      "url": "http://hl7.org/fhir/StructureDefinition/translation"
-    },
-    {
-      "extension": [
-        {
-          "url": "lang",
-          "valueCode": "kaa"
-        },
-        {
-          "url": "content",
-          "valueString": "Tashkent wálayat juqpalı kesellikler emlewxanası"
-        }
-      ],
-      "url": "http://hl7.org/fhir/StructureDefinition/translation"
-    }
-  ]
+{
+  "language": "uz",
+  "name": "Toshkent viloyati yuqumli kasalliklar shifoxonasi",
+  "_name": {
+    "extension": [
+      {
+        "extension": [
+          {"url": "lang", "valueCode": "ru"},
+          {
+            "url": "content",
+            "valueString": "Ташкентская областная инфекционная больница"
+          }
+        ],
+        "url": "http://hl7.org/fhir/StructureDefinition/translation"
+      },
+      {
+        "extension": [
+          {"url": "lang", "valueCode": "kaa"},
+          {
+            "url": "content",
+            "valueString": "Tashkent wálayat juqpalı kesellikler emlewxanası"
+          }
+        ],
+        "url": "http://hl7.org/fhir/StructureDefinition/translation"
+      }
+    ]
+  }
 }
 ```
 
@@ -60,9 +57,7 @@
 
 ### Must-Support элементы
 
-Требование "Must Support" применяется в двух контекстах в рамках Цифровой платформы здравоохранения Узбекистана:
-
-**UZ Core профили:** Элементы, отмеченные как Must Support, должны быть заполнены при обмене данными между системами, работающими в Узбекистане.
+UZ Core профили: Элементы, отмеченные как Must Support, должны быть заполнены при обмене данными между системами, работающими в Узбекистане.
 
 Когда данные не могут быть заполнены, потому что они недоступны в исходной системе, элемент может остаться пустым — при условии, что правила кардинальности это позволяют. Однако, когда требования кардинальности обязывают включение, системы должны использовать расширение Data Absent Reason, а не оставлять элемент пустым.
 
@@ -72,20 +67,29 @@
   - **taxId**: Налоговый идентификатор (`system`: `https://dhp.uz/fhir/core/sid/org/uz/soliq`, `type.coding.code`: `TAX`)
   - **argosId**: Идентификатор ARGOS (`system`: `https://dhp.uz/fhir/core/sid/org/uz/argos`)
 - **active**: Статус активности
-- **type**: Классификации организации (nomenclatureGroup, organizationalServiceGroup, organizationalStructure, organizationType, specialization, subordinationGroup, withoutLegalStatus)
+- **type**: Тип организации. Элемент использует множественные системы кодирования для классификации организаций по разным измерениям:
+  - Группа номенклатуры (nomenclatureGroup) - институциональная группировка
+  - Группа организационных услуг (organizationalServiceGroup) - классификация по предоставляемым услугам
+  - Организационная структура (organizationalStructure) - структурная классификация
+  - Тип организации (organizationType) - основной тип учреждения
+  - Специализация (specialization) - медицинская специализация
+  - Группа подчинения (subordinationGroup) - административная подчинённость
+  - Статус без юридического лица (withoutLegalStatus) - юридический статус
+
+  Допустимые коды для каждого измерения можно найти в соответствующих наборах значений (ValueSets), привязанных к каждому срезу (slice) в [профиле uz-core-organization](https://dhp.uz/fhir/core/en/StructureDefinition-uz-core-organization.html).
 - **partOf**: Ссылка на родительскую организацию
 
 ## CRUD операции
 
 ### Create (Создание)
 
-**HTTP метод**: POST
-**Endpoint**: `/Organization`
-**Заголовки**: `Content-Type: application/fhir+json`
+- HTTP метод: POST
+- Endpoint: `/Organization`
+- Заголовки: `Content-Type: application/fhir+json`
 
 Создание новой организации. Сервер присваивает уникальный ID и возвращает Location header.
 
-**Минимальный пример**:
+Минимальный пример:
 ```json
 {
   "resourceType": "Organization",
@@ -122,7 +126,7 @@
 }
 ```
 
-**Ответ**: HTTP 201 Created с Location header и созданным ресурсом.
+Ответ: HTTP 201 Created с Location header и созданным ресурсом.
 
 #### Условное создание
 
@@ -135,22 +139,22 @@ If-None-Exist: identifier=https://dhp.uz/fhir/core/sid/org/uz/soliq|123456789
 
 ### Read (Чтение)
 
-**HTTP метод**: GET
-**Endpoint**: `/Organization/[id]`
+- HTTP метод: GET
+- Endpoint: `/Organization/[id]`
 
 Получение конкретной организации по ID.
 
-**Ответ**: HTTP 200 OK с ресурсом Organization или HTTP 404 Not Found.
+Ответ: HTTP 200 OK с ресурсом Organization или HTTP 404 Not Found.
 
 ### Update (Обновление)
 
-**HTTP метод**: PUT
-**Endpoint**: `/Organization/[id]`
-**Заголовки**: `Content-Type: application/fhir+json`
+- HTTP метод: PUT
+- Endpoint: `/Organization/[id]`
+- Заголовки: `Content-Type: application/fhir+json`
 
 Полное обновление организации. Необходимо отправить весь ресурс, включая элемент `id`.
 
-**Пример**:
+Пример:
 ```json
 {
   "resourceType": "Organization",
@@ -164,7 +168,7 @@ If-None-Exist: identifier=https://dhp.uz/fhir/core/sid/org/uz/soliq|123456789
 }
 ```
 
-**Ответ**: HTTP 200 OK с обновлённым ресурсом.
+Ответ: HTTP 200 OK с обновлённым ресурсом.
 
 #### Условное обновление
 
@@ -176,17 +180,17 @@ PUT /Organization?identifier=https://dhp.uz/fhir/core/sid/org/uz/soliq|123456789
 
 ### Delete (Удаление)
 
-**HTTP метод**: DELETE
-**Endpoint**: `/Organization/[id]`
+- HTTP метод: DELETE
+- Endpoint: `/Organization/[id]`
 
 Удаление организации. Обратите внимание на ограничения целостности данных (например, организацию нельзя удалить, если на неё ссылаются другие ресурсы).
 
-**Ответ**: HTTP 204 No Content или HTTP 404 Not Found.
+Ответ: HTTP 204 No Content или HTTP 404 Not Found.
 
 ## Поиск
 
-**HTTP метод**: GET
-**Endpoint**: `/Organization?[параметры]`
+- HTTP метод: GET
+- Endpoint: `/Organization?[параметры]`
 
 ### Параметры поиска
 
@@ -271,7 +275,7 @@ GET /Organization?partof=Organization/parent-org-id
 
 Используйте Bundle типа "transaction" или "batch" для выполнения нескольких операций:
 
-**Endpoint**: `/` (корневой)
+Endpoint: `/` (корневой)
 
 ```json
 {
@@ -303,8 +307,8 @@ GET /Organization?partof=Organization/parent-org-id
 }
 ```
 
-**transaction**: Атомарное выполнение (всё или ничего)
-**batch**: Независимое выполнение каждой операции
+- **transaction**: Атомарное выполнение (всё или ничего)
+- **batch**: Независимое выполнение каждой операции
 
 ## Обработка ошибок
 
