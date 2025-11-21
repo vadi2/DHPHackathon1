@@ -1,4 +1,4 @@
-# Scenario 1: Organization management
+# Organization management
 
 ## Overview
 
