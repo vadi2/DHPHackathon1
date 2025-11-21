@@ -1,27 +1,27 @@
-# Scenario 1: Organization Management
+# Сценарий 1: Управление организациями
 
-## Overview
+## Обзор
 
-Goal: Retrieve existing organizations and departments, integrate them into software, update and create as needed.
+Цель: Получение существующих организаций и подразделений, их интеграция в программное обеспечение, обновление и создание по мере необходимости.
 
-- Resources: Organization
-- Skills: GET/POST/PUT/DELETE operations, search, references, identifiers
-- Base URL: `https://playground.dhp.uz/fhir`
-- Profile: [uz-core-organization](https://dhp.uz/fhir/core/en/StructureDefinition-uz-core-organization.html)
+- Ресурсы: Organization
+- Навыки: GET/POST/PUT/DELETE операции, поиск, ссылки, идентификаторы
+- Базовый URL: `https://playground.dhp.uz/fhir`
+- Профиль: [uz-core-organization](https://dhp.uz/fhir/core/en/StructureDefinition-uz-core-organization.html)
 
-**Feedback:** Share your experience, issues and successes in the [connectathon document](https://docs.google.com/document/d/1PdQ8zBI9xkISP3tAqIK8-TGMql3kVVZ4UNoHVYqCy4Y/edit?usp=sharing).
+**Обратная связь:** Поделитесь своим опытом, проблемами и успехами в [документе коннектафона](https://docs.google.com/document/d/1PdQ8zBI9xkISP3tAqIK8-TGMql3kVVZ4UNoHVYqCy4Y/edit?usp=sharing).
 
-## uz-core-organization Profile
+## Профиль uz-core-organization
 
-**Note**: Validation is currently disabled on the server, but client applications should follow the profile rules to ensure compatibility and data quality.
+**Примечание**: В настоящее время валидация на сервере отключена, но клиентские приложения должны следовать правилам профиля для обеспечения совместимости и качества данных.
 
-### Required Elements
+### Обязательные элементы
 
-- **name** (1..1): Organization name in Uzbek language
+- **name** (1..1): Название организации на узбекском языке
 
-#### Name Translations
+#### Переводы названия
 
-To add translations of the name in Russian and Karakalpak languages, use the standard [translation](http://hl7.org/fhir/R5/extension-translation.html) extension. The extension is applied to the `_name` element:
+Для добавления переводов названия на русский и каракалпакский языки используйте стандартное расширение [translation](http://hl7.org/fhir/R5/extension-translation.html). Расширение применяется к элементу `_name`:
 
 ```json
 {
@@ -54,46 +54,46 @@ To add translations of the name in Russian and Karakalpak languages, use the sta
 }
 ```
 
-Language codes:
-- `uz` - Uzbek (primary language for the `name` field)
-- `ru` - Russian
-- `kaa` - Karakalpak
+Коды языков:
+- `uz` - узбекский (основной язык для поля `name`)
+- `ru` - русский
+- `kaa` - каракалпакский
 
-### Must-Support Elements
+### Must-Support элементы
 
-UZ Core profiles: Elements marked as Must Support must be populated when exchanging data between systems operating in Uzbekistan.
+UZ Core профили: Элементы, отмеченные как Must Support, должны быть заполнены при обмене данными между системами, работающими в Узбекистане.
 
-When data cannot be populated because it is unavailable in the source system, the element may be left empty - provided that cardinality rules allow it. However, when cardinality requirements mandate inclusion, systems must use the Data Absent Reason extension rather than leaving the element empty.
+Когда данные не могут быть заполнены, потому что они недоступны в исходной системе, элемент может остаться пустым — при условии, что правила кардинальности это позволяют. Однако, когда требования кардинальности обязывают включение, системы должны использовать расширение Data Absent Reason, а не оставлять элемент пустым.
 
-#### Profile Elements
+#### Элементы профиля
 
-- **identifier**: Organization identifiers
-  - **taxId**: Tax identifier (`system`: `https://dhp.uz/fhir/core/sid/org/uz/soliq`)
-  - **argosId**: ARGOS identifier (`system`: `https://dhp.uz/fhir/core/sid/org/uz/argos`)
-- **active**: Activity status
-- **type**: Organization type. The element uses multiple coding systems to classify organizations across different dimensions:
-  - Nomenclature group (nomenclatureGroup) - institutional grouping
-  - Organizational service group (organizationalServiceGroup) - classification by provided services
-  - Organizational structure (organizationalStructure) - structural classification
-  - Organization type (organizationType) - primary institution type
-  - Specialization (specialization) - medical specialization
-  - Subordination group (subordinationGroup) - administrative subordination
-  - Without legal status (withoutLegalStatus) - legal status
+- **identifier**: Идентификаторы организации
+  - **taxId**: Налоговый идентификатор (`system`: `https://dhp.uz/fhir/core/sid/org/uz/soliq`)
+  - **argosId**: Идентификатор ARGOS (`system`: `https://dhp.uz/fhir/core/sid/org/uz/argos`)
+- **active**: Статус активности
+- **type**: Тип организации. Элемент использует множественные системы кодирования для классификации организаций по разным измерениям:
+  - Группа номенклатуры (nomenclatureGroup) - институциональная группировка
+  - Группа организационных услуг (organizationalServiceGroup) - классификация по предоставляемым услугам
+  - Организационная структура (organizationalStructure) - структурная классификация
+  - Тип организации (organizationType) - основной тип учреждения
+  - Специализация (specialization) - медицинская специализация
+  - Группа подчинения (subordinationGroup) - административная подчинённость
+  - Статус без юридического лица (withoutLegalStatus) - юридический статус
 
-  Valid codes for each dimension can be found in the corresponding ValueSets bound to each slice in the [uz-core-organization profile](https://dhp.uz/fhir/core/en/StructureDefinition-uz-core-organization.html).
-- **partOf**: Reference to parent organization
+  Допустимые коды для каждого измерения можно найти в соответствующих наборах значений (ValueSets), привязанных к каждому срезу (slice) в [профиле uz-core-organization](https://dhp.uz/fhir/core/en/StructureDefinition-uz-core-organization.html).
+- **partOf**: Ссылка на родительскую организацию
 
-## CRUD Operations
+## CRUD операции
 
-### Create
+### Create (Создание)
 
-- HTTP method: POST
+- HTTP метод: POST
 - Endpoint: `/Organization`
-- Headers: `Content-Type: application/fhir+json`
+- Заголовки: `Content-Type: application/fhir+json`
 
-Creating a new organization. The server assigns a unique ID and returns a Location header.
+Создание новой организации. Сервер присваивает уникальный ID и возвращает Location header.
 
-Minimal example:
+Минимальный пример:
 ```json
 {
   "resourceType": "Organization",
@@ -128,35 +128,35 @@ Minimal example:
 }
 ```
 
-Response: HTTP 201 Created with Location header and created resource.
+Ответ: HTTP 201 Created с Location header и созданным ресурсом.
 
-### Read
+### Read (Чтение)
 
-- HTTP method: GET
+- HTTP метод: GET
 - Endpoint: `/Organization/[id]`
 
-Retrieving a specific organization by ID. The system has many organizations and their departments already loaded from the Argos HRM personnel management system.
+Получение конкретной организации по ID. В системе уже загружено множество организаций и их подразделений из системы управления персоналом Argos HRM.
 
-Response: HTTP 200 OK with Organization resource or HTTP 404 Not Found.
+Ответ: HTTP 200 OK с ресурсом Organization или HTTP 404 Not Found.
 
-### Update
+### Update (Обновление)
 
-- HTTP method: PUT
+- HTTP метод: PUT
 - Endpoint: `/Organization/[id]`
-- Headers:
+- Заголовки:
   - `Content-Type: application/fhir+json`
-  - `If-Match: W/"[versionId]"` (required to prevent conflicts)
+  - `If-Match: W/"[versionId]"` (обязательно для предотвращения конфликтов)
 
-Full update of an organization. The entire resource must be sent, including the `id` element. The `If-Match` header is required and must contain the resource version from the `meta.versionId` element to prevent conflicts during concurrent editing (optimistic locking).
+Полное обновление организации. Необходимо отправить весь ресурс, включая элемент `id`. Заголовок `If-Match` обязателен и должен содержать версию ресурса из элемента `meta.versionId`, чтобы предотвратить конфликты при одновременном редактировании (optimistic locking).
 
-Request example:
+Пример запроса:
 ```
 PUT /Organization/existing-id
 If-Match: W/"2"
 Content-Type: application/fhir+json
 ```
 
-Request body example:
+Пример тела запроса:
 ```json
 {
   "resourceType": "Organization",
@@ -166,53 +166,53 @@ Request body example:
   },
   "identifier": [...],
   "active": true,
-  "name": "Updated name"
+  "name": "Обновлённое название"
 }
 ```
 
-Response: HTTP 200 OK with updated resource.
+Ответ: HTTP 200 OK с обновлённым ресурсом.
 
-### Delete
+### Delete (Удаление)
 
-- HTTP method: DELETE
+- HTTP метод: DELETE
 - Endpoint: `/Organization/[id]`
 
-Deleting an organization.
+Удаление организации.
 
-Response: HTTP 200 OK with OperationOutcome on successful deletion. When attempting to read a deleted resource, the server will return HTTP 410 Gone.
+Ответ: HTTP 200 OK с OperationOutcome при успешном удалении. При попытке прочитать удалённый ресурс сервер вернёт HTTP 410 Gone.
 
-## Search
+## Поиск
 
-- HTTP method: GET
-- Endpoint: `/Organization?[parameters]`
+- HTTP метод: GET
+- Endpoint: `/Organization?[параметры]`
 
-### Search Parameters
+### Параметры поиска
 
-| Parameter | Type | Description | Example |
+| Параметр | Тип | Описание | Пример |
 |----------|-----|----------|--------|
-| `_id` | token | Search by ID | `?_id=123` |
-| `identifier` | token | Search by identifier | `?identifier=https://dhp.uz/fhir/core/sid/org/uz/soliq\|123456789` |
-| `name` | string | Search by name (partial match) | `?name=Fergana` |
-| `name:exact` | string | Exact name match | `?name:exact=Fergana` |
-| `type` | token | Search by organization type | `?type=prov` |
-| `active` | token | Filter by status | `?active=true` |
-| `partof` | reference | Search for departments | `?partof=Organization/parent-id` |
+| `_id` | token | Поиск по ID | `?_id=123` |
+| `identifier` | token | Поиск по идентификатору | `?identifier=https://dhp.uz/fhir/core/sid/org/uz/soliq\|123456789` |
+| `name` | string | Поиск по названию (частичное совпадение) | `?name=Fergana` |
+| `name:exact` | string | Точное совпадение имени | `?name:exact=Fergana` |
+| `type` | token | Поиск по типу организации | `?type=prov` |
+| `active` | token | Фильтр по статусу | `?active=true` |
+| `partof` | reference | Поиск подразделений | `?partof=Organization/parent-id` |
 
-### Modifiers and Prefixes
+### Модификаторы и префиксы
 
-Combining parameters (logical AND):
+Комбинирование параметров (логическое AND):
 ```
 GET /Organization?name=Hospital&active=true
 ```
 
-Multiple values (logical OR):
+Множественные значения (логическое OR):
 ```
 GET /Organization?type=prov,dept
 ```
 
-### Pagination
+### Пагинация
 
-Search results are returned in a Bundle with pagination (20 records per page):
+Результаты поиска возвращаются в Bundle с пагинацией (20 записей на страницу):
 
 ```json
 {
@@ -233,13 +233,13 @@ Search results are returned in a Bundle with pagination (20 records per page):
 }
 ```
 
-Use `Bundle.link` with `relation="next"` to get the next page.
+Используйте `Bundle.link` с `relation="next"` для получения следующей страницы.
 
-**Known issue**: The `Bundle.total` field may return `0` even when results are present. To count organizations on the current page, filter `Bundle.entry` by `resourceType == "Organization"` (the response may contain `OperationOutcome` resources).
+**Известная проблема**: Поле `Bundle.total` может возвращать `0` даже при наличии результатов. Для подсчёта организаций на текущей странице фильтруйте `Bundle.entry` по `resourceType == "Organization"` (в ответе могут быть ресурсы `OperationOutcome`).
 
-## Organization Hierarchy
+## Иерархия организаций
 
-Departments are linked to parent organizations through the `partOf` element:
+Подразделения связываются с родительскими организациями через элемент `partOf`:
 
 ```json
 {
@@ -262,29 +262,29 @@ Departments are linked to parent organizations through the `partOf` element:
 }
 ```
 
-Get all departments of an organization:
+Получить все подразделения организации:
 ```
 GET /Organization?partof=Organization/parent-org-id
 ```
 
-## Error Handling
+## Обработка ошибок
 
-### Response Codes
+### Коды ответов
 
-| Code | Description |
+| Код | Описание |
 |-----|----------|
-| 200 | OK - successful retrieval/update/deletion |
-| 201 | Created - successful creation |
-| 400 | Bad Request - invalid JSON |
-| 404 | Not Found - resource not found |
-| 409 | Conflict - version conflict |
-| 410 | Gone - resource was deleted |
-| 412 | Precondition Failed - If-Match header not provided or version mismatch |
-| 422 | Unprocessable Entity - failed profile validation |
+| 200 | OK - успешное получение/обновление/удаление |
+| 201 | Created - успешное создание |
+| 400 | Bad Request - невалидный JSON |
+| 404 | Not Found - ресурс не найден |
+| 409 | Conflict - конфликт версий |
+| 410 | Gone - ресурс был удалён |
+| 412 | Precondition Failed - не передан заголовок If-Match или версия не совпадает |
+| 422 | Unprocessable Entity - не прошёл валидацию профиля |
 
 ### OperationOutcome
 
-On errors, the server returns an OperationOutcome:
+При ошибках сервер возвращает OperationOutcome:
 
 ```json
 {
@@ -299,22 +299,22 @@ On errors, the server returns an OperationOutcome:
 }
 ```
 
-## Example Organizations in the System
+## Примеры организаций в системе
 
-Organization types:
-- **prov** (Healthcare Provider): Medical institutions
-- **dept** (Department): Departments and offices
+Типы организаций:
+- **prov** (Healthcare Provider): Медицинские учреждения
+- **dept** (Department): Отделения и кабинеты
 
-Examples of medical institutions (type=prov):
+Примеры медицинских учреждений (type=prov):
 - Farg'ona tumani sanitariya-epidemiologik osoyishtalik va jamoat salomatligi bo'limi
 - Yashnobod tumani tibbiyot birlashmasi - 32-son oilaviy poliklinikasi
 - Tumanlararo 4-son Teri tanosil kasalliklari dispanseri
 
-Examples of departments (type=dept):
+Примеры отделений (type=dept):
 - Эндоскопия кабинети (Endoscopy Cabinet)
 - Бактериология лабораторияси (Bacteriology Laboratory)
 
-## Useful Links
+## Полезные ссылки
 
 - [FHIR Organization Resource](http://hl7.org/fhir/R5/organization.html)
 - [uz-core-organization Profile](https://dhp.uz/fhir/core/en/StructureDefinition-uz-core-organization.html)
@@ -323,11 +323,11 @@ Examples of departments (type=dept):
 
 ---
 
-## Code Examples
+## Примеры кода
 
 {% include code-tabs-style.html %}
 
-Below are examples of creating a new organization in various programming languages:
+Ниже представлены примеры создания новой организации на различных языках программирования:
 
 <div class="code-tabs">
   <ul class="nav nav-tabs" role="tablist">
@@ -397,10 +397,10 @@ from fhir.resources.codeableconcept import CodeableConcept
 from fhir.resources.coding import Coding
 from fhir.resources.meta import Meta
 
-# FHIR server base URL
+# FHIR сервер базовый URL
 base_url = "https://playground.dhp.uz/fhir"
 
-# Creating a new organization using fhir.resources
+# Создание новой организации с использованием fhir.resources
 organization = Organization(
     meta=Meta(
         profile=["https://dhp.uz/fhir/core/StructureDefinition/uz-core-organization"]
@@ -434,7 +434,7 @@ organization = Organization(
     name="Yangi tibbiyot muassasasi"
 )
 
-# Sending POST request
+# Отправка POST запроса
 response = requests.post(
     f"{base_url}/Organization",
     headers={"Content-Type": "application/fhir+json"},
@@ -443,14 +443,14 @@ response = requests.post(
 
 if response.status_code == 201:
     created_org = response.json()
-    print(f"Organization created with ID: {created_org['id']}")
+    print(f"Организация создана с ID: {created_org['id']}")
 else:
-    print(f"Error: {response.status_code}")
+    print(f"Ошибка: {response.status_code}")
     print(response.text)
 </code></pre>
     </div>
     <div class="tab-pane" id="javascript">
-<pre><code class="language-javascript">// Using fetch API
+<pre><code class="language-javascript">// Используя fetch API
 const baseUrl = "https://playground.dhp.uz/fhir";
 
 const organization = {
@@ -487,7 +487,7 @@ const organization = {
   name: "Yangi tibbiyot muassasasi"
 };
 
-// Creating organization
+// Создание организации
 fetch(`${baseUrl}/Organization`, {
   method: 'POST',
   headers: {
@@ -499,13 +499,13 @@ fetch(`${baseUrl}/Organization`, {
   if (response.status === 201) {
     return response.json();
   }
-  throw new Error(`Error: ${response.status}`);
+  throw new Error(`Ошибка: ${response.status}`);
 })
 .then(data =&gt; {
-  console.log(`Organization created with ID: ${data.id}`);
+  console.log(`Организация создана с ID: ${data.id}`);
 })
 .catch(error =&gt; {
-  console.error('Error:', error);
+  console.error('Ошибка:', error);
 });
 </code></pre>
     </div>
@@ -514,18 +514,18 @@ fetch(`${baseUrl}/Organization`, {
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.r5.model.*;
 
-// Creating FHIR context and client
+// Создание FHIR контекста и клиента
 FhirContext ctx = FhirContext.forR5();
 IGenericClient client = ctx.newRestfulGenericClient("https://playground.dhp.uz/fhir");
 
-// Creating organization
+// Создание организации
 Organization organization = new Organization();
 
-// Setting profile
+// Установка профиля
 organization.getMeta()
     .addProfile("https://dhp.uz/fhir/core/StructureDefinition/uz-core-organization");
 
-// Adding identifier
+// Добавление идентификатора
 Identifier taxId = organization.addIdentifier();
 taxId.setSystem("https://dhp.uz/fhir/core/sid/org/uz/soliq");
 taxId.setValue("123456789");
@@ -535,10 +535,10 @@ taxType.addCoding()
     .setCode("TAX");
 taxId.setType(taxType);
 
-// Setting status
+// Установка статуса
 organization.setActive(true);
 
-// Adding type
+// Добавление типа
 CodeableConcept orgType = new CodeableConcept();
 orgType.addCoding()
     .setSystem("http://terminology.hl7.org/CodeSystem/organization-type")
@@ -546,17 +546,17 @@ orgType.addCoding()
     .setDisplay("Healthcare Provider");
 organization.addType(orgType);
 
-// Setting name
+// Установка названия
 organization.setName("Yangi tibbiyot muassasasi");
 
-// Creating on server
+// Создание на сервере
 MethodOutcome outcome = client.create()
     .resource(organization)
     .execute();
 
-// Getting ID of created organization
+// Получение ID созданной организации
 IdType id = (IdType) outcome.getId();
-System.out.println("Organization created with ID: " + id.getIdPart());
+System.out.println("Организация создана с ID: " + id.getIdPart());
 </code></pre>
     </div>
     <div class="tab-pane" id="csharp">
@@ -564,10 +564,10 @@ System.out.println("Organization created with ID: " + id.getIdPart());
 using Hl7.Fhir.Rest;
 using System;
 
-// Creating FHIR client
+// Создание FHIR клиента
 var client = new FhirClient("https://playground.dhp.uz/fhir");
 
-// Creating organization
+// Создание организации
 var organization = new Organization
 {
     Meta = new Meta
@@ -612,9 +612,9 @@ var organization = new Organization
     Name = "Yangi tibbiyot muassasasi"
 };
 
-// Creating on server
+// Создание на сервере
 var createdOrg = client.Create(organization);
-Console.WriteLine($"Organization created with ID: {createdOrg.Id}");
+Console.WriteLine($"Организация создана с ID: {createdOrg.Id}");
 </code></pre>
     </div>
     <div class="tab-pane" id="go">
@@ -661,7 +661,7 @@ type Coding struct {
 func main() {
     baseURL := "https://playground.dhp.uz/fhir"
 
-    // Creating organization
+    // Создание организации
     org := Organization{
         ResourceType: "Organization",
         Meta: &amp;Meta{
@@ -696,13 +696,13 @@ func main() {
         Name: "Yangi tibbiyot muassasasi",
     }
 
-    // Serializing to JSON
+    // Сериализация в JSON
     jsonData, err := json.Marshal(org)
     if err != nil {
         panic(err)
     }
 
-    // Sending POST request
+    // Отправка POST запроса
     resp, err := http.Post(
         baseURL+"/Organization",
         "application/fhir+json",
@@ -717,9 +717,9 @@ func main() {
         body, _ := io.ReadAll(resp.Body)
         var createdOrg Organization
         json.Unmarshal(body, &amp;createdOrg)
-        fmt.Printf("Organization created with ID: %s\n", createdOrg.ID)
+        fmt.Printf("Организация создана с ID: %s\n", createdOrg.ID)
     } else {
-        fmt.Printf("Error: %d\n", resp.StatusCode)
+        fmt.Printf("Ошибка: %d\n", resp.StatusCode)
     }
 }
 </code></pre>
