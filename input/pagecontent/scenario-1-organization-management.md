@@ -263,45 +263,6 @@ GET /Organization?type=prov,dept
 GET /Organization?partof=Organization/parent-org-id
 ```
 
-## Пакетные операции
-
-Используйте Bundle типа "transaction" или "batch" для выполнения нескольких операций:
-
-Endpoint: `/` (корневой)
-
-```json
-{
-  "resourceType": "Bundle",
-  "type": "transaction",
-  "entry": [
-    {
-      "request": {
-        "method": "POST",
-        "url": "Organization"
-      },
-      "resource": {
-        "resourceType": "Organization",
-        ...
-      }
-    },
-    {
-      "request": {
-        "method": "PUT",
-        "url": "Organization/existing-id"
-      },
-      "resource": {
-        "resourceType": "Organization",
-        "id": "existing-id",
-        ...
-      }
-    }
-  ]
-}
-```
-
-- **transaction**: Атомарное выполнение (всё или ничего)
-- **batch**: Независимое выполнение каждой операции
-
 ## Обработка ошибок
 
 ### Коды ответов
