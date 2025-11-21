@@ -629,6 +629,7 @@ GET /PractitionerRole?_include=PractitionerRole:practitioner&_include=Practition
   "meta": {
     "profile": ["https://dhp.uz/fhir/core/StructureDefinition/uz-core-practitioner"]
   },
+  "language": "uz",
   "identifier": [
     {
       "use": "official",
