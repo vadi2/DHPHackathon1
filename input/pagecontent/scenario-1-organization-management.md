@@ -9,7 +9,7 @@
 - Базовый URL: `https://playground.dhp.uz/fhir`
 - Профиль: [uz-core-organization](https://dhp.uz/fhir/core/en/StructureDefinition-uz-core-organization.html)
 
-**Обратная связь:** Поделитесь своим опытом, проблемами и успехами в [документе коннектатона](https://docs.google.com/document/d/1PdQ8zBI9xkISP3tAqIK8-TGMql3kVVZ4UNoHVYqCy4Y/edit?usp=sharing).
+**Обратная связь:** Поделитесь своим опытом, проблемами и успехами в [документе коннектафона](https://docs.google.com/document/d/1PdQ8zBI9xkISP3tAqIK8-TGMql3kVVZ4UNoHVYqCy4Y/edit?usp=sharing).
 
 ## Профиль uz-core-organization
 
