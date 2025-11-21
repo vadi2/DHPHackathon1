@@ -508,7 +508,7 @@ GET /Practitioner?birthdate=gt1980-01-01&birthdate=lt1990-12-31
 
 1. **Поиск вашей организации** по ИНН (soliq ID):
    ```
-   GET /Organization?identifier=https://dpm.uz/identifier/soliq|123456789
+   GET /Organization?identifier=https://dhp.uz/fhir/core/sid/org/uz/soliq|123456789
    ```
 
 2. **Поиск практикующих специалистов** в вашей организации:

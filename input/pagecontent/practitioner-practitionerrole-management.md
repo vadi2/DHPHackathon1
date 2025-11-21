@@ -508,7 +508,7 @@ Use `Bundle.link` with `relation="next"` to get the next page.
 
 1. **Find your organization** by soliq (tax) ID:
    ```
-   GET /Organization?identifier=https://dpm.uz/identifier/soliq|123456789
+   GET /Organization?identifier=https://dhp.uz/fhir/core/sid/org/uz/soliq|123456789
    ```
 
 2. **Search for practitioners** in your organization:
