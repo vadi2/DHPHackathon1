@@ -1388,12 +1388,14 @@ import (
 
 const baseURL = "https://playground.dhp.uz/fhir"
 
+type Contains struct {
+    System  string `json:"system"`
+    Code    string `json:"code"`
+    Display string `json:"display"`
+}
+
 type ValueSetExpansion struct {
-    Contains []struct {
-        System  string `json:"system"`
-        Code    string `json:"code"`
-        Display string `json:"display"`
-    } `json:"contains"`
+    Contains []Contains `json:"contains"`
 }
 
 type ValueSetExpanded struct {
@@ -1408,11 +1410,7 @@ type Parameters struct {
     } `json:"parameter"`
 }
 
-func expandValueSet(valueSetURL string) ([]struct {
-    System  string
-    Code    string
-    Display string
-}, error) {
+func expandValueSet(valueSetURL string) ([]Contains, error) {
     params := url.Values{}
     params.Add("url", valueSetURL)
 
