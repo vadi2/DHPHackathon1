@@ -61,8 +61,9 @@ FHIR предоставляет три основных ресурса для р
 
 **ConceptMap** определяет отображения между кодами в разных CodeSystem. Это необходимо, когда нужно транслировать данные между различными системами кодирования.
 
-**Пример:** Отображение между узбекскими кодами профессий и международными кодами SNOMED CT:
-- `2211.1` (UZ код) → `59058001` (SNOMED: General physician)
+**Пример:** ConceptMap [`iso-3166-alpha3-to-alpha2-cs`](https://dhp.uz/fhir/core/en/ConceptMap-iso-3166-alpha3-to-alpha2-cs.html) переводит между 3-буквенными и 2-буквенными кодами стран ISO:
+- `UZB` (3-буквенный код) → `UZ` (2-буквенный код)
+- `ABW` (Аруба 3-буквенный) → `AW` (Аруба 2-буквенный)
 
 Ключевые элементы:
 - **sourceCanonical**: URL исходной CodeSystem или ValueSet
@@ -75,7 +76,6 @@ FHIR предоставляет три основных ресурса для р
 - Конвертация данных при обмене с международными системами
 - Одновременная поддержка нескольких стандартов кодирования
 - Миграция со старых систем кодов на новые
-- Создание отчётов, агрегирующих данные из разных систем кодирования
 
 ### Управление версиями
 
@@ -193,16 +193,16 @@ GET /ValueSet?url=https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs
 ### Чтение ConceptMap
 
 - HTTP метод: GET
-- Endpoint: `/ConceptMap/[id]`
+- Endpoint: `/ConceptMap?url=[canonical-url]`
 
-Получение конкретной ConceptMap по её ID.
+Получение конкретного ConceptMap по его каноническому URL. Это рекомендуемый подход, так как канонические URL являются глобально уникальными идентификаторами, которые остаются стабильными на разных серверах.
 
 Пример:
 ```
-GET /ConceptMap/position-to-snomed
+GET /ConceptMap?url=https://terminology.dhp.uz/fhir/core/ConceptMap/iso-3166-alpha3-to-alpha2-cs
 ```
 
-Ответ: HTTP 200 OK с ресурсом ConceptMap, показывающим отображения между системами кодов.
+Ответ: HTTP 200 OK с Bundle, содержащим ресурс ConceptMap, показывающий отображения между системами кодов в `entry[0].resource`.
 
 ## Операции поиска
 
@@ -241,12 +241,12 @@ GET /ConceptMap/position-to-snomed
 
 | Параметр | Тип | Описание | Пример |
 |----------|-----|----------|--------|
-| `_id` | token | Поиск по ID | `?_id=position-to-snomed` |
-| `url` | uri | Поиск по каноническому URL | `?url=https://dhp.uz/fhir/core/ConceptMap/position-to-snomed` |
-| `name` | string | Поиск по имени | `?name=position` |
+| `_id` | token | Поиск по ID | `?_id=iso-3166-alpha3-to-alpha2-cs` |
+| `url` | uri | Поиск по каноническому URL | `?url=https://terminology.dhp.uz/fhir/core/ConceptMap/iso-3166-alpha3-to-alpha2-cs` |
+| `name` | string | Поиск по имени | `?name=iso` |
 | `status` | token | Фильтр по статусу | `?status=active` |
-| `source-uri` | uri | Исходная система или ValueSet | `?source-uri=https://terminology.dhp.uz/...` |
-| `target-uri` | uri | Целевая система или ValueSet | `?target-uri=http://snomed.info/sct` |
+| `source-uri` | uri | Исходная система или ValueSet | `?source-uri=urn:iso:std:iso:3166` |
+| `target-uri` | uri | Целевая система или ValueSet | `?target-uri=urn:iso:std:iso:3166` |
 
 ### Типичные шаблоны поиска
 
@@ -270,9 +270,9 @@ GET /ValueSet?status=active
 GET /CodeSystem?url=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs&_sort=-version
 ```
 
-**Найти ConceptMap между двумя конкретными системами:**
+**Найти ConceptMap для кодов стран ISO 3166:**
 ```
-GET /ConceptMap?source-uri=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs&target-uri=http://snomed.info/sct
+GET /ConceptMap?source-uri=urn:iso:std:iso:3166
 ```
 
 ### Пагинация
@@ -555,9 +555,9 @@ GET /ConceptMap?status=active
 GET /ConceptMap?source-uri=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs
 ```
 
-**Найти ConceptMap между двумя конкретными системами:**
+**Найти ConceptMap для кодов стран ISO 3166:**
 ```
-GET /ConceptMap?source-uri=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs&target-uri=http://snomed.info/sct
+GET /ConceptMap?source-uri=urn:iso:std:iso:3166
 ```
 
 ### Использование операции $translate

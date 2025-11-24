@@ -61,8 +61,9 @@ Key elements:
 
 A **ConceptMap** defines mappings between codes in different CodeSystems. This is essential when you need to translate data between different coding systems.
 
-**Example:** Mapping between Uzbekistan profession codes and international SNOMED CT codes:
-- `2211.1` (UZ code) → `59058001` (SNOMED: General physician)
+**Example:** The [`iso-3166-alpha3-to-alpha2-cs`](https://dhp.uz/fhir/core/en/ConceptMap-iso-3166-alpha3-to-alpha2-cs.html) ConceptMap translates between ISO 3-letter and 2-letter country codes:
+- `UZB` (3-letter code) → `UZ` (2-letter code)
+- `ABW` (Aruba 3-letter) → `AW` (Aruba 2-letter)
 
 Key elements:
 - **sourceCanonical**: URL of the source CodeSystem or ValueSet
@@ -192,16 +193,16 @@ The response is a Bundle with the ValueSet resource in `entry[0].resource`:
 ### Read ConceptMap
 
 - HTTP method: GET
-- Endpoint: `/ConceptMap/[id]`
+- Endpoint: `/ConceptMap?url=[canonical-url]`
 
-Retrieving a specific ConceptMap by its ID.
+Retrieving a specific ConceptMap by its canonical URL. This is the recommended approach as canonical URLs are globally unique identifiers that remain stable across different servers.
 
 Example:
 ```
-GET /ConceptMap/position-to-snomed
+GET /ConceptMap?url=https://terminology.dhp.uz/fhir/core/ConceptMap/iso-3166-alpha3-to-alpha2-cs
 ```
 
-Response: HTTP 200 OK with ConceptMap resource showing the mappings between code systems.
+Response: HTTP 200 OK with a Bundle containing the ConceptMap resource showing the mappings between code systems in `entry[0].resource`.
 
 ## Search operations
 
@@ -240,12 +241,12 @@ Response: HTTP 200 OK with ConceptMap resource showing the mappings between code
 
 | Parameter | Type | Description | Example |
 |----------|-----|----------|--------|
-| `_id` | token | Search by ID | `?_id=position-to-snomed` |
-| `url` | uri | Search by canonical URL | `?url=https://dhp.uz/fhir/core/ConceptMap/position-to-snomed` |
-| `name` | string | Search by name | `?name=position` |
+| `_id` | token | Search by ID | `?_id=iso-3166-alpha3-to-alpha2-cs` |
+| `url` | uri | Search by canonical URL | `?url=https://terminology.dhp.uz/fhir/core/ConceptMap/iso-3166-alpha3-to-alpha2-cs` |
+| `name` | string | Search by name | `?name=iso` |
 | `status` | token | Filter by status | `?status=active` |
-| `source-uri` | uri | Source system or ValueSet | `?source-uri=https://terminology.dhp.uz/...` |
-| `target-uri` | uri | Target system or ValueSet | `?target-uri=http://snomed.info/sct` |
+| `source-uri` | uri | Source system or ValueSet | `?source-uri=urn:iso:std:iso:3166` |
+| `target-uri` | uri | Target system or ValueSet | `?target-uri=urn:iso:std:iso:3166` |
 
 ### Common search patterns
 
@@ -269,9 +270,9 @@ GET /ValueSet?status=active
 GET /CodeSystem?url=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs&_sort=-version
 ```
 
-**Find ConceptMaps between two specific systems:**
+**Find ConceptMaps for ISO 3166 country codes:**
 ```
-GET /ConceptMap?source-uri=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs&target-uri=http://snomed.info/sct
+GET /ConceptMap?source-uri=urn:iso:std:iso:3166
 ```
 
 ### Pagination
@@ -554,9 +555,9 @@ GET /ConceptMap?status=active
 GET /ConceptMap?source-uri=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs
 ```
 
-**Find ConceptMaps between two specific systems:**
+**Find ConceptMaps for ISO 3166 country codes:**
 ```
-GET /ConceptMap?source-uri=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs&target-uri=http://snomed.info/sct
+GET /ConceptMap?source-uri=urn:iso:std:iso:3166
 ```
 
 ### Using $translate operation
