@@ -626,25 +626,23 @@ Let's walk through a complete scenario: building a practitioner registration for
 ### Scenario: Practitioner registration form
 
 **Requirements:**
-- User needs to select their profession from a dropdown
-- Only valid professions should be selectable
-- The system should validate the selection
-- The display should show the profession name in the user's language
+- User needs to select their license/credential from a dropdown
+- Only valid credentials should be selectable
+- The display should show the credential name in the user's language
 
 **Resources used in this scenario:**
-- [Position and Profession CodeSystem](https://dhp.uz/fhir/core/en/CodeSystem-position-and-profession-cs.html)
-- [Position and Profession ValueSet](https://dhp.uz/fhir/core/en/ValueSet-position-and-profession-vs.html)
+- [License, Certificate, Degree ValueSet](https://dhp.uz/fhir/core/en/ValueSet-license-certificate-vs.html)
 
 **Step 1: Find the relevant ValueSet**
 
-First, identify which ValueSet defines allowed professions by browsing the [uz-core terminology artifacts page](https://dhp.uz/fhir/core/en/artifacts.html#4).
+First, identify which ValueSet defines allowed credentials by browsing the [uz-core terminology artifacts page](https://dhp.uz/fhir/core/en/artifacts.html#4).
 
-From the artifacts page, we find the ValueSet URL: `https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs`
+From the artifacts page, we find the ValueSet URL: `https://terminology.dhp.uz/fhir/core/ValueSet/license-certificate-vs`
 
 **Step 2: Expand the ValueSet to populate the dropdown**
 
 ```
-GET /ValueSet/$expand?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs&count=100
+GET /ValueSet/$expand?url=https://terminology.dhp.uz/fhir/core/ValueSet/license-certificate-vs&count=100
 ```
 
 Response gives us all codes to populate the dropdown:
@@ -653,45 +651,35 @@ Response gives us all codes to populate the dropdown:
   "expansion": {
     "contains": [
       {
-        "system": "https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs",
-        "code": "2211.1",
-        "display": "Umumiy amaliyot shifokori"
+        "system": "http://terminology.hl7.org/CodeSystem/v2-0360",
+        "code": "MD",
+        "display": "Doctor of Medicine"
       },
       {
-        "system": "https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs",
-        "code": "2212",
-        "display": "Tibbiyot mutaxassisi"
+        "system": "http://terminology.hl7.org/CodeSystem/v2-0360",
+        "code": "RN",
+        "display": "Registered Nurse"
       }
     ]
   }
 }
 ```
 
-**Step 3: User selects a profession**
+**Step 3: User selects a credential**
 
-User selects "Umumiy amaliyot shifokori" (code: `2211.1`)
+User selects "Doctor of Medicine" (code: `MD`)
 
-**Step 4: Validate the selection (optional but recommended)**
+**Step 4: Look up display names for other languages (optional)**
 
-Before saving, validate that the code is actually valid:
-
-```
-GET /ValueSet/$validate-code?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs&code=2211.1&system=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs
-```
-
-If `result` is `true`, proceed with saving.
-
-**Step 5: Look up display names for other languages (optional)**
-
-If you need to show the profession in multiple languages:
+If you need to show the credential in multiple languages:
 
 ```
-GET /CodeSystem/$lookup?system=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs&code=2211.1
+GET /CodeSystem/$lookup?system=http://terminology.hl7.org/CodeSystem/v2-0360&code=MD
 ```
 
 This returns all available designations (translations).
 
-**Step 6: Save in the Practitioner resource**
+**Step 5: Save in the Practitioner resource**
 
 ```json
 {
@@ -702,9 +690,9 @@ This returns all available designations (translations).
       "code": {
         "coding": [
           {
-            "system": "https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs",
-            "code": "2211.1",
-            "display": "Umumiy amaliyot shifokori"
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0360",
+            "code": "MD",
+            "display": "Doctor of Medicine"
           }
         ]
       }
@@ -719,11 +707,9 @@ This returns all available designations (translations).
 
 2. **Handle pagination**: If a ValueSet is large, the expansion may be paginated. Implement proper pagination handling.
 
-3. **Validate on the server**: Even if you validate on the client, always validate on the server before saving data.
+3. **Use version binding**: In production, pin to specific ValueSet versions to ensure consistency.
 
-4. **Use version binding**: In production, pin to specific ValueSet versions to ensure consistency.
-
-5. **Handle missing codes gracefully**: If a code isn't found during lookup, handle it gracefully rather than failing.
+4. **Handle missing codes gracefully**: If a code isn't found during lookup, handle it gracefully rather than failing.
 
 ## Error handling
 

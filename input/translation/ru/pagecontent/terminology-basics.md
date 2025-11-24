@@ -626,25 +626,23 @@ Content-Type: application/fhir+json
 ### Сценарий: Форма регистрации врача
 
 **Требования:**
-- Пользователь должен выбрать свою профессию из выпадающего списка
-- Только валидные профессии должны быть доступны для выбора
-- Система должна валидировать выбор
-- Отображение должно показывать название профессии на языке пользователя
+- Пользователь должен выбрать свою лицензию/сертификат из выпадающего списка
+- Только валидные сертификаты должны быть доступны для выбора
+- Отображение должно показывать название сертификата на языке пользователя
 
 **Ресурсы, используемые в этом сценарии:**
-- [Система кодов должностей и профессий](https://dhp.uz/fhir/core/en/CodeSystem-position-and-profession-cs.html)
-- [Набор значений должностей и профессий](https://dhp.uz/fhir/core/en/ValueSet-position-and-profession-vs.html)
+- [Набор значений лицензий, сертификатов и степеней](https://dhp.uz/fhir/core/en/ValueSet-license-certificate-vs.html)
 
 **Шаг 1: Найти соответствующий ValueSet**
 
-Сначала определите, какой ValueSet определяет допустимые профессии, просмотрев [страницу артефактов терминологии uz-core](https://dhp.uz/fhir/core/en/artifacts.html#4).
+Сначала определите, какой ValueSet определяет допустимые сертификаты, просмотрев [страницу артефактов терминологии uz-core](https://dhp.uz/fhir/core/en/artifacts.html#4).
 
-Со страницы артефактов получаем URL ValueSet: `https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs`
+Со страницы артефактов получаем URL ValueSet: `https://terminology.dhp.uz/fhir/core/ValueSet/license-certificate-vs`
 
 **Шаг 2: Расширить ValueSet для заполнения выпадающего списка**
 
 ```
-GET /ValueSet/$expand?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs&count=100
+GET /ValueSet/$expand?url=https://terminology.dhp.uz/fhir/core/ValueSet/license-certificate-vs&count=100
 ```
 
 Ответ даёт нам все коды для заполнения выпадающего списка:
@@ -653,45 +651,35 @@ GET /ValueSet/$expand?url=https://terminology.dhp.uz/fhir/core/ValueSet/position
   "expansion": {
     "contains": [
       {
-        "system": "https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs",
-        "code": "2211.1",
-        "display": "Umumiy amaliyot shifokori"
+        "system": "http://terminology.hl7.org/CodeSystem/v2-0360",
+        "code": "MD",
+        "display": "Doctor of Medicine"
       },
       {
-        "system": "https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs",
-        "code": "2212",
-        "display": "Tibbiyot mutaxassisi"
+        "system": "http://terminology.hl7.org/CodeSystem/v2-0360",
+        "code": "RN",
+        "display": "Registered Nurse"
       }
     ]
   }
 }
 ```
 
-**Шаг 3: Пользователь выбирает профессию**
+**Шаг 3: Пользователь выбирает сертификат**
 
-Пользователь выбирает "Umumiy amaliyot shifokori" (код: `2211.1`)
+Пользователь выбирает "Doctor of Medicine" (код: `MD`)
 
-**Шаг 4: Валидировать выбор (опционально, но рекомендуется)**
+**Шаг 4: Искать отображаемые имена для других языков (опционально)**
 
-Перед сохранением валидируйте, что код действительно валиден:
-
-```
-GET /ValueSet/$validate-code?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs&code=2211.1&system=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs
-```
-
-Если `result` равен `true`, продолжайте сохранение.
-
-**Шаг 5: Искать отображаемые имена для других языков (опционально)**
-
-Если нужно показать профессию на нескольких языках:
+Если нужно показать сертификат на нескольких языках:
 
 ```
-GET /CodeSystem/$lookup?system=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs&code=2211.1
+GET /CodeSystem/$lookup?system=http://terminology.hl7.org/CodeSystem/v2-0360&code=MD
 ```
 
 Это возвращает все доступные обозначения (переводы).
 
-**Шаг 6: Сохранить в ресурсе Practitioner**
+**Шаг 5: Сохранить в ресурсе Practitioner**
 
 ```json
 {
@@ -702,9 +690,9 @@ GET /CodeSystem/$lookup?system=https://terminology.dhp.uz/fhir/core/CodeSystem/p
       "code": {
         "coding": [
           {
-            "system": "https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs",
-            "code": "2211.1",
-            "display": "Umumiy amaliyot shifokori"
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0360",
+            "code": "MD",
+            "display": "Doctor of Medicine"
           }
         ]
       }
@@ -719,11 +707,9 @@ GET /CodeSystem/$lookup?system=https://terminology.dhp.uz/fhir/core/CodeSystem/p
 
 2. **Обрабатывайте пагинацию**: Если ValueSet большой, расширение может быть пагинированным. Реализуйте правильную обработку пагинации.
 
-3. **Валидируйте на сервере**: Даже если вы валидируете на клиенте, всегда валидируйте на сервере перед сохранением данных.
+3. **Используйте привязку версий**: В продакшн привязывайтесь к конкретным версиям ValueSet для обеспечения согласованности.
 
-4. **Используйте привязку версий**: В продакшн привязывайтесь к конкретным версиям ValueSet для обеспечения согласованности.
-
-5. **Обрабатывайте отсутствующие коды gracefully**: Если код не найден во время поиска, обработайте это gracefully, а не падайте с ошибкой.
+4. **Обрабатывайте отсутствующие коды gracefully**: Если код не найден во время поиска, обработайте это gracefully, а не падайте с ошибкой.
 
 ## Обработка ошибок
 
