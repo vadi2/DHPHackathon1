@@ -988,32 +988,6 @@ Questions to explore:
 - How do you cache expansion results efficiently?
 - How do you handle errors at each step?
 
-**Exercise 11: Implement version pinning**
-
-Task: Modify your Exercise 10 implementation to:
-- Pin to a specific version of the ValueSet
-- Check if a newer version is available
-- Provide a migration path when updating versions
-
-Questions to explore:
-- How do you detect version changes?
-- How do you test against multiple versions?
-- What happens to data coded with old versions?
-
-**Exercise 12: Handle errors gracefully**
-
-Task: Implement comprehensive error handling for all terminology operations:
-
-1. Try to expand a non-existent ValueSet
-2. Try to validate a code with wrong system
-3. Try to look up a non-existent code
-4. Try to expand with an invalid version
-
-Questions to explore:
-- What error codes are returned?
-- How can you provide user-friendly error messages?
-- How do you log errors for debugging?
-
 ## Useful links
 
 **FHIR Documentation:**
