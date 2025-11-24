@@ -94,17 +94,47 @@ def run_patient_tests() -> TestResults:
     else:
         results.add_fail('Search patient by PINFL identifier', f"Status {response.status_code}")
 
-    # Test 2: Search patient by name with :contains modifier
-    response = make_request('GET', '/Patient', params={'name:contains': 'Karimov'})
-    assert_status_code(response, 200, 'Search patient by name', results)
+    # Test 2: Search patient by name with :contains modifier (using our test data)
+    response = make_request('GET', '/Patient', params={'name:contains': f'{TEST_IDENTIFIER_PREFIX}SearchTest'})
+    if response.status_code == 200:
+        bundle = response.json()
+        entries = bundle.get('entry', [])
+        patient_entries = [e for e in entries if e.get('resource', {}).get('resourceType') == 'Patient']
+        if len(patient_entries) > 0:
+            print(f"  {Colors.CYAN}→ Found {len(patient_entries)} patient(s) with name{Colors.RESET}")
+            results.add_pass('Search patient by name')
+        else:
+            results.add_skip('Search patient by name', 'Test patient not found by name')
+    else:
+        results.add_fail('Search patient by name', f"Status {response.status_code}")
 
-    # Test 3: Search by given name with :contains modifier
-    response = make_request('GET', '/Patient', params={'given:contains': 'Alisher'})
-    assert_status_code(response, 200, 'Search patient by given name', results)
+    # Test 3: Search by given name with :contains modifier (using our test data)
+    response = make_request('GET', '/Patient', params={'given:contains': 'Test'})
+    if response.status_code == 200:
+        bundle = response.json()
+        entries = bundle.get('entry', [])
+        patient_entries = [e for e in entries if e.get('resource', {}).get('resourceType') == 'Patient']
+        if len(patient_entries) > 0:
+            print(f"  {Colors.CYAN}→ Found {len(patient_entries)} patient(s) with given name{Colors.RESET}")
+            results.add_pass('Search patient by given name')
+        else:
+            results.add_skip('Search patient by given name', 'No patients with test given name found')
+    else:
+        results.add_fail('Search patient by given name', f"Status {response.status_code}")
 
-    # Test 4: Search by family name with :contains modifier
-    response = make_request('GET', '/Patient', params={'family:contains': 'Karimov'})
-    assert_status_code(response, 200, 'Search patient by family name', results)
+    # Test 4: Search by family name with :contains modifier (using our test data)
+    response = make_request('GET', '/Patient', params={'family:contains': f'{TEST_IDENTIFIER_PREFIX}SearchTest'})
+    if response.status_code == 200:
+        bundle = response.json()
+        entries = bundle.get('entry', [])
+        patient_entries = [e for e in entries if e.get('resource', {}).get('resourceType') == 'Patient']
+        if len(patient_entries) > 0:
+            print(f"  {Colors.CYAN}→ Found {len(patient_entries)} patient(s) with family name{Colors.RESET}")
+            results.add_pass('Search patient by family name')
+        else:
+            results.add_skip('Search patient by family name', 'Test patient not found by family name')
+    else:
+        results.add_fail('Search patient by family name', f"Status {response.status_code}")
 
     # Test 5: Search by phone number
     # Note: Phone search appears to not work on this server (known limitation)
