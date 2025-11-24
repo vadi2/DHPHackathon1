@@ -424,6 +424,7 @@ All supported search parameters can be found in the capability statement at [DHP
 | `gender` | token | Search by gender | `?gender=male` |
 | `active` | token | Filter by status | `?active=true` |
 | `deceased` | token | Filter by deceased status | `?deceased=false` |
+| `qualification-code` | token | Search by qualification | `?qualification-code=MD` |
 
 ### PractitionerRole search parameters
 
@@ -458,6 +459,11 @@ GET /Practitioner?address-city=Toshkent&active=true
 **Find all roles for a specific practitioner:**
 ```
 GET /PractitionerRole?practitioner=Practitioner/123
+```
+
+**Find practitioners by qualification:**
+```
+GET /Practitioner?qualification-code=MD
 ```
 
 **Find all practitioners working at a specific organization:**
