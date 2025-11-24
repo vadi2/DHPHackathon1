@@ -152,7 +152,7 @@ Retrieving a specific ValueSet by its canonical URL. This is the recommended app
 
 Example:
 ```
-GET /ValueSet?url=https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs
+GET /ValueSet?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs
 ```
 
 Response: HTTP 200 OK with a Bundle containing the ValueSet resource in `entry[0].resource`.
@@ -170,7 +170,7 @@ The response is a Bundle with the ValueSet resource in `entry[0].resource`:
       "resource": {
         "resourceType": "ValueSet",
         "id": "position-and-profession-vs",
-        "url": "https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs",
+        "url": "https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs",
         "version": "1.0.0",
         "name": "PositionAndProfessionVS",
         "title": "Position and Profession Values",
@@ -226,7 +226,7 @@ Response: HTTP 200 OK with a Bundle containing the ConceptMap resource showing t
 
 | Parameter | Type | Description | Example |
 |----------|-----|----------|--------|
-| `url` | uri | Search by canonical URL | `?url=https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs` |
+| `url` | uri | Search by canonical URL | `?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs` |
 | `name` | string | Search by name | `?name=position` |
 | `title` | string | Search by title | `?title=profession` |
 | `status` | token | Filter by status | `?status=active` |
@@ -298,7 +298,7 @@ The `$expand` operation expands a ValueSet to return the actual list of codes. T
 
 **Example 1: Basic expansion**
 ```
-GET /ValueSet/$expand?url=https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs
+GET /ValueSet/$expand?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs
 ```
 
 Response:
@@ -327,14 +327,14 @@ Response:
 
 **Example 2: Expansion with filter**
 ```
-GET /ValueSet/$expand?url=https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs&filter=general
+GET /ValueSet/$expand?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs&filter=general
 ```
 
 This returns only codes where the display name contains "general".
 
 **Example 3: Expansion with count limit**
 ```
-GET /ValueSet/$expand?url=https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs&count=10
+GET /ValueSet/$expand?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs&count=10
 ```
 
 This returns only the first 10 codes.
@@ -364,7 +364,7 @@ The `$validate-code` operation checks if a code is valid in a ValueSet. This is 
 
 **Example 1: Valid code**
 ```
-GET /ValueSet/$validate-code?url=https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs&code=2211.1&system=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs
+GET /ValueSet/$validate-code?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs&code=2211.1&system=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs
 ```
 
 Response:
@@ -386,7 +386,7 @@ Response:
 
 **Example 2: Invalid code**
 ```
-GET /ValueSet/$validate-code?url=https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs&code=INVALID&system=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs
+GET /ValueSet/$validate-code?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs&code=INVALID&system=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs
 ```
 
 Response:
@@ -505,12 +505,12 @@ GET /CodeSystem?url=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and
 
 **Expand a specific version of a ValueSet:**
 ```
-GET /ValueSet/$expand?url=https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs&valueSetVersion=1.0.0
+GET /ValueSet/$expand?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs&valueSetVersion=1.0.0
 ```
 
 **Validate against a specific version:**
 ```
-GET /ValueSet/$validate-code?url=https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs&valueSetVersion=1.0.0&code=2211.1&system=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs
+GET /ValueSet/$validate-code?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs&valueSetVersion=1.0.0&code=2211.1&system=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs
 ```
 
 **Look up in a specific version:**
@@ -572,7 +572,7 @@ The `$translate` operation translates a code from one system to another using a 
 
 Using GET:
 ```
-GET /ConceptMap/$translate?url=https://dhp.uz/fhir/core/ConceptMap/position-to-snomed&system=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs&code=2211.1&target=http://snomed.info/sct
+GET /ConceptMap/$translate?url=https://terminology.dhp.uz/fhir/core/ConceptMap/position-to-snomed&system=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs&code=2211.1&target=http://snomed.info/sct
 ```
 
 Using POST (recommended for complex requests):
@@ -585,7 +585,7 @@ Content-Type: application/fhir+json
   "parameter": [
     {
       "name": "url",
-      "valueUri": "https://dhp.uz/fhir/core/ConceptMap/position-to-snomed"
+      "valueUri": "https://terminology.dhp.uz/fhir/core/ConceptMap/position-to-snomed"
     },
     {
       "name": "system",
@@ -657,12 +657,12 @@ First, identify which ValueSet defines allowed professions:
 GET /ValueSet?name=position-and-profession
 ```
 
-From the results, we get the ValueSet URL: `https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs`
+From the results, we get the ValueSet URL: `https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs`
 
 **Step 2: Expand the ValueSet to populate the dropdown**
 
 ```
-GET /ValueSet/$expand?url=https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs&displayLanguage=uz&count=100
+GET /ValueSet/$expand?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs&displayLanguage=uz&count=100
 ```
 
 Response gives us all codes to populate the dropdown:
@@ -694,7 +694,7 @@ User selects "Umumiy amaliyot shifokori" (code: `2211.1`)
 Before saving, validate that the code is actually valid:
 
 ```
-GET /ValueSet/$validate-code?url=https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs&code=2211.1&system=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs
+GET /ValueSet/$validate-code?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs&code=2211.1&system=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs
 ```
 
 If `result` is `true`, proceed with saving.
@@ -753,7 +753,7 @@ This returns all available designations (translations).
 
 Request:
 ```
-GET /ValueSet/$validate-code?url=https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs&code=INVALID&system=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs
+GET /ValueSet/$validate-code?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs&code=INVALID&system=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs
 ```
 
 Response:
@@ -779,7 +779,7 @@ Response:
 
 Request:
 ```
-GET /ValueSet/$expand?url=https://dhp.uz/fhir/core/ValueSet/nonexistent-vs
+GET /ValueSet/$expand?url=https://terminology.dhp.uz/fhir/core/ValueSet/nonexistent-vs
 ```
 
 Response:
@@ -790,7 +790,7 @@ Response:
     {
       "severity": "error",
       "code": "not-found",
-      "diagnostics": "ValueSet with URL 'https://dhp.uz/fhir/core/ValueSet/nonexistent-vs' not found"
+      "diagnostics": "ValueSet with URL 'https://terminology.dhp.uz/fhir/core/ValueSet/nonexistent-vs' not found"
     }
   ]
 }
@@ -844,7 +844,7 @@ Response:
 
 Request:
 ```
-GET /ValueSet/$validate-code?url=https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs&code=2211.1&system=http://wrong-system.com
+GET /ValueSet/$validate-code?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs&code=2211.1&system=http://wrong-system.com
 ```
 
 Response:
@@ -914,7 +914,7 @@ Questions to explore:
 Task: Expand the gender-other ValueSet to see all possible values.
 
 ```
-GET /ValueSet/$expand?url=https://dhp.uz/fhir/core/ValueSet/gender-other-vs
+GET /ValueSet/$expand?url=https://terminology.dhp.uz/fhir/core/ValueSet/gender-other-vs
 ```
 
 Questions to explore:
@@ -927,7 +927,7 @@ Questions to explore:
 Task: Check if code "2211.1" is valid in the position-and-profession ValueSet.
 
 ```
-GET /ValueSet/$validate-code?url=https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs&code=2211.1&system=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs
+GET /ValueSet/$validate-code?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs&code=2211.1&system=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs
 ```
 
 Questions to explore:
@@ -980,7 +980,7 @@ Questions to explore:
 Task: Expand the position-and-profession ValueSet but filter to only show codes containing "nurse".
 
 ```
-GET /ValueSet/$expand?url=https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs&filter=nurse
+GET /ValueSet/$expand?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs&filter=nurse
 ```
 
 Questions to explore:
@@ -1095,11 +1095,11 @@ Below are examples of expanding a ValueSet and validating a code in various prog
   <div class="tab-content">
     <div class="tab-pane active" id="curl">
 <pre><code class="language-bash"># Expand a ValueSet
-curl -X GET "https://playground.dhp.uz/fhir/ValueSet/\$expand?url=https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs" \
+curl -X GET "https://playground.dhp.uz/fhir/ValueSet/\$expand?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs" \
   -H "Accept: application/fhir+json"
 
 # Validate a code
-curl -X GET "https://playground.dhp.uz/fhir/ValueSet/\$validate-code?url=https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs&code=2211.1&system=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs" \
+curl -X GET "https://playground.dhp.uz/fhir/ValueSet/\$validate-code?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs&code=2211.1&system=https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs" \
   -H "Accept: application/fhir+json"
 
 # Lookup a code
@@ -1169,7 +1169,7 @@ def lookup_code(system: str, code: str) -> Dict:
     return {}
 
 # Example usage
-valueset_url = "https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs"
+valueset_url = "https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs"
 codesystem_url = "https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs"
 
 # Expand ValueSet
@@ -1249,7 +1249,7 @@ async function lookupCode(system, code) {
 }
 
 // Example usage
-const valueSetUrl = "https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs";
+const valueSetUrl = "https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs";
 const codeSystemUrl = "https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs";
 
 (async () => {
@@ -1344,7 +1344,7 @@ public class TerminologyExample {
     }
 
     public static void main(String[] args) {
-        String valueSetUrl = "https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs";
+        String valueSetUrl = "https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs";
         String codeSystemUrl = "https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs";
 
         // Expand ValueSet
@@ -1413,7 +1413,7 @@ class TerminologyExample
 
     static void Main()
     {
-        var valueSetUrl = "https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs";
+        var valueSetUrl = "https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs";
         var codeSystemUrl = "https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs";
 
         // Expand ValueSet
@@ -1545,7 +1545,7 @@ func lookupCode(system, code string) (*Parameters, error) {
 }
 
 func main() {
-    valueSetURL := "https://dhp.uz/fhir/core/ValueSet/position-and-profession-vs"
+    valueSetURL := "https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs"
     codeSystemURL := "https://terminology.dhp.uz/fhir/core/CodeSystem/position-and-profession-cs"
 
     // Expand ValueSet
