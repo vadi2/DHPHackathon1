@@ -134,9 +134,27 @@ The PractitionerRole resource describes a specific set of roles, specialties, se
 - **telecom**: Contact details specific to this role
 - **endpoint**: Technical endpoints providing access to services operated for the role
 
-### Practitioner-Organization relationship
+### Understanding Practitioner and PractitionerRole
 
-PractitionerRole links practitioners to organizations where they work:
+**Practitioner** and **PractitionerRole** are separate but related resources:
+
+- **Practitioner**: Represents the person - their demographics, qualifications, and personal identifiers. A practitioner is created once and contains information that doesn't change based on where or how they work.
+  - Example: Dr. Alisher Karimov with national ID, birth date, qualifications
+
+- **PractitionerRole**: Represents a job or position - the roles, specialties, and locations where a practitioner works. The same practitioner can have multiple roles in different organizations or departments.
+  - Example: Dr. Karimov works as a general practitioner at Clinic A and as a consultant at Hospital B
+
+**Why separate resources?**
+- A doctor may work at multiple organizations simultaneously
+- A doctor may have different roles in the same organization (e.g., surgeon and department head)
+- Role-specific information (schedule, contact numbers, locations) belongs to the role, not the person
+- Job assignments change more frequently than personal information
+
+**Real-world scenario:**
+1. Create one Practitioner resource for Dr. Karimov
+2. Create PractitionerRole #1: Dr. Karimov as general practitioner at Toshkent Clinic
+3. Create PractitionerRole #2: Dr. Karimov as cardiology consultant at Fergana Hospital
+4. If Dr. Karimov stops working at Toshkent Clinic, deactivate PractitionerRole #1 without touching the Practitioner resource or PractitionerRole #2
 
 ```json
 {
