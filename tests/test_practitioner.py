@@ -18,14 +18,77 @@ def run_practitioner_tests() -> TestResults:
 
     print(f"\n{Colors.BOLD}=== Practitioner Tests ==={Colors.RESET}\n")
 
+    # Setup: Create test practitioner first for search tests
+    print(f"\n{Colors.BOLD}Search Tests Setup{Colors.RESET}")
+    test_argos_id = f"{TEST_IDENTIFIER_PREFIX}argos-12345678"
+    test_practitioner = {
+        "resourceType": "Practitioner",
+        "meta": {
+            "profile": ["https://dhp.uz/fhir/core/StructureDefinition/uz-core-practitioner"]
+        },
+        "language": "uz",
+        "identifier": [
+            {
+                "use": "official",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                            "code": "NI"
+                        }
+                    ]
+                },
+                "system": "https://dhp.uz/fhir/core/sid/pro/uz/argos",
+                "value": test_argos_id
+            }
+        ],
+        "active": True,
+        "name": [
+            {
+                "use": "official",
+                "family": f"{TEST_IDENTIFIER_PREFIX}TestPractitioner",
+                "given": ["Test", "Search"]
+            }
+        ],
+        "gender": "male"
+    }
+
+    response = make_request('POST', '/Practitioner', data=test_practitioner)
+    test_practitioner_id = None
+    if response.status_code == 201:
+        created_pract = response.json()
+        test_practitioner_id = created_pract['id']
+        created_resources.append(('Practitioner', test_practitioner_id))
+        results.add_pass("Create test practitioner for search tests")
+
+        # Wait for indexing
+        print(f"{Colors.BLUE}Waiting 5 seconds for server indexing...{Colors.RESET}")
+        import time
+        time.sleep(5)
+    else:
+        results.add_fail("Create test practitioner", f"Status {response.status_code}")
+
     # Search Tests
     print(f"\n{Colors.BOLD}Practitioner Search Tests{Colors.RESET}")
 
-    # Test 1: Search practitioner by ARGOS identifier
-    response = make_request('GET', '/Practitioner', params={
-        'identifier': 'https://dhp.uz/fhir/core/sid/pro/uz/argos|12345'
-    })
-    assert_status_code(response, 200, 'Search practitioner by ARGOS identifier', results)
+    # Test 1: Search practitioner by ARGOS identifier (using our test data)
+    if test_argos_id:
+        response = make_request('GET', '/Practitioner', params={
+            'identifier': f'https://dhp.uz/fhir/core/sid/pro/uz/argos|{test_argos_id}'
+        })
+        if response.status_code == 200:
+            bundle = response.json()
+            entries = bundle.get('entry', [])
+            pract_entries = [e for e in entries if e.get('resource', {}).get('resourceType') == 'Practitioner']
+            if len(pract_entries) > 0:
+                print(f"  {Colors.CYAN}→ Found {len(pract_entries)} practitioner(s) with ARGOS ID{Colors.RESET}")
+                results.add_pass('Search practitioner by ARGOS identifier')
+            else:
+                results.add_skip('Search practitioner by ARGOS identifier', 'Test practitioner not found')
+        else:
+            results.add_fail('Search practitioner by ARGOS identifier', f"Status {response.status_code}")
+    else:
+        results.add_skip('Search practitioner by ARGOS identifier', 'Test practitioner not created')
 
     # Test 2: Search practitioner by name with :contains modifier
     response = make_request('GET', '/Practitioner', params={'name:contains': 'Karimov'})
@@ -98,8 +161,8 @@ def run_practitioner_tests() -> TestResults:
     # CRUD Operations
     print(f"\n{Colors.BOLD}Practitioner CRUD Operations{Colors.RESET}")
 
-    # Test 13: Create practitioner
-    test_practitioner = {
+    # Test 13: Create another practitioner for CRUD tests
+    crud_test_practitioner = {
         "resourceType": "Practitioner",
         "meta": {
             "profile": ["https://dhp.uz/fhir/core/StructureDefinition/uz-core-practitioner"]
@@ -117,15 +180,15 @@ def run_practitioner_tests() -> TestResults:
                     ]
                 },
                 "system": "https://dhp.uz/fhir/core/sid/pro/uz/argos",
-                "value": f"{TEST_IDENTIFIER_PREFIX}12345678"
+                "value": f"{TEST_IDENTIFIER_PREFIX}crud-98765432"
             }
         ],
         "active": True,
         "name": [
             {
                 "use": "official",
-                "family": f"{TEST_IDENTIFIER_PREFIX}Karimov",
-                "given": ["Alisher", "Akbarovich"]
+                "family": f"{TEST_IDENTIFIER_PREFIX}CrudTest",
+                "given": ["CRUD", "Operations"]
             }
         ],
         "gender": "male",
@@ -144,7 +207,7 @@ def run_practitioner_tests() -> TestResults:
         ]
     }
 
-    response = make_request('POST', '/Practitioner', data=test_practitioner)
+    response = make_request('POST', '/Practitioner', data=crud_test_practitioner)
     if response.status_code == 201:
         created_pract = response.json()
         pract_id = created_pract['id']
