@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
 Main test runner for FHIR API tests
-Runs all test suites and provides comprehensive reporting
+Runs selected test suites and provides comprehensive reporting
 """
 import sys
 import time
+import argparse
 from test_utils import Colors, TestResults
 from test_organization import run_organization_tests
 from test_practitioner import run_practitioner_tests
@@ -12,12 +13,13 @@ from test_patient import run_patient_tests
 from config import BASE_URL
 
 
-def print_header():
+def print_header(scenarios):
     """Print test suite header"""
     print(f"\n{Colors.BOLD}{'='*70}{Colors.RESET}")
     print(f"{Colors.BOLD}FHIR API Test Suite{Colors.RESET}")
     print(f"{Colors.BOLD}{'='*70}{Colors.RESET}")
-    print(f"\nTesting against: {Colors.BLUE}{BASE_URL}{Colors.RESET}\n")
+    print(f"\nTesting against: {Colors.BLUE}{BASE_URL}{Colors.RESET}")
+    print(f"Scenarios: {Colors.CYAN}{', '.join(scenarios)}{Colors.RESET}\n")
 
 
 def print_separator():
@@ -36,39 +38,85 @@ def aggregate_results(all_results: list) -> TestResults:
     return total
 
 
+def parse_args():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(
+        description='Run FHIR API test scenarios',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python run_all_tests.py                    # Run all scenarios
+  python run_all_tests.py organization       # Run only organization tests
+  python run_all_tests.py patient practitioner  # Run patient and practitioner tests
+  python run_all_tests.py org pract pat      # Short names also work
+        """
+    )
+    parser.add_argument(
+        'scenarios',
+        nargs='*',
+        choices=['organization', 'org', 'practitioner', 'pract', 'patient', 'pat', 'all'],
+        help='Scenarios to run (organization, practitioner, patient, or all). Short names accepted (org, pract, pat).'
+    )
+    return parser.parse_args()
+
+
+def normalize_scenarios(scenarios):
+    """Normalize scenario names and handle 'all'"""
+    # Map short names to full names
+    name_map = {
+        'org': 'organization',
+        'pract': 'practitioner',
+        'pat': 'patient',
+        'organization': 'organization',
+        'practitioner': 'practitioner',
+        'patient': 'patient'
+    }
+
+    # If no scenarios specified or 'all' is specified, run all
+    if not scenarios or 'all' in scenarios:
+        return ['organization', 'practitioner', 'patient']
+
+    # Normalize and deduplicate
+    normalized = []
+    for scenario in scenarios:
+        full_name = name_map.get(scenario.lower())
+        if full_name and full_name not in normalized:
+            normalized.append(full_name)
+
+    return normalized
+
+
 def main():
-    """Run all test suites"""
-    print_header()
+    """Run selected test suites"""
+    args = parse_args()
+    scenarios = normalize_scenarios(args.scenarios)
+
+    print_header(scenarios)
 
     start_time = time.time()
     all_results = []
 
-    # Run Organization tests
-    try:
-        org_results = run_organization_tests()
-        all_results.append(org_results)
-        print_separator()
-    except Exception as e:
-        print(f"{Colors.RED}Organization tests failed with exception: {e}{Colors.RESET}")
-        sys.exit(1)
+    # Available test scenarios
+    test_scenarios = {
+        'organization': ('Organization', run_organization_tests),
+        'practitioner': ('Practitioner/PractitionerRole', run_practitioner_tests),
+        'patient': ('Patient', run_patient_tests)
+    }
 
-    # Run Practitioner/PractitionerRole tests
-    try:
-        pract_results = run_practitioner_tests()
-        all_results.append(pract_results)
-        print_separator()
-    except Exception as e:
-        print(f"{Colors.RED}Practitioner tests failed with exception: {e}{Colors.RESET}")
-        sys.exit(1)
+    # Run selected scenarios
+    for scenario in scenarios:
+        if scenario not in test_scenarios:
+            continue
 
-    # Run Patient tests
-    try:
-        patient_results = run_patient_tests()
-        all_results.append(patient_results)
-        print_separator()
-    except Exception as e:
-        print(f"{Colors.RED}Patient tests failed with exception: {e}{Colors.RESET}")
-        sys.exit(1)
+        name, test_func = test_scenarios[scenario]
+        try:
+            results = test_func()
+            all_results.append(results)
+            if scenario != scenarios[-1]:  # Don't print separator after last test
+                print_separator()
+        except Exception as e:
+            print(f"{Colors.RED}{name} tests failed with exception: {e}{Colors.RESET}")
+            sys.exit(1)
 
     # Aggregate and print final results
     elapsed_time = time.time() - start_time

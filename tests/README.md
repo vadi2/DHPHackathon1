@@ -48,9 +48,36 @@ The test suite can be configured using environment variables:
 ```bash
 cd tests
 python run_all_tests.py
+# Or explicitly:
+python run_all_tests.py all
 ```
 
-### Run Specific Test Suite
+### Run Specific Scenarios
+
+You can run individual scenarios or combine them:
+
+```bash
+# Run single scenario (full name)
+python run_all_tests.py organization
+python run_all_tests.py practitioner
+python run_all_tests.py patient
+
+# Run single scenario (short name)
+python run_all_tests.py org
+python run_all_tests.py pract
+python run_all_tests.py pat
+
+# Run multiple scenarios
+python run_all_tests.py org patient
+python run_all_tests.py pract org
+
+# See available options
+python run_all_tests.py --help
+```
+
+### Run Individual Test Files Directly
+
+You can also run test files directly without the wrapper:
 
 ```bash
 # Organization tests only
