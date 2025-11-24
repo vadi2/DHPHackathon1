@@ -18,6 +18,8 @@ This test suite validates all sample queries, searches, and CRUD operations docu
 - ✅ Tests duplicate detection and patient matching logic
 - ✅ Configurable for different server environments
 - ✅ Colored output for easy result reading
+- ✅ **Full JSON responses with syntax highlighting**
+- ✅ **Highlights relevant fields being tested**
 - ✅ Comprehensive test reporting
 
 ## Requirements
@@ -175,10 +177,18 @@ tests/
 
 ## Output
 
-The test suite provides colored output:
+The test suite provides colored output with full JSON responses:
 - ✓ Green: Test passed
 - ✗ Red: Test failed
 - ⊘ Yellow: Test skipped
+- 🔵 Blue: HTTP requests/responses
+- 🔷 Cyan: Highlighted fields being tested
+
+### Features
+- **Full JSON responses**: No truncation, see complete server responses
+- **Syntax highlighting**: Color-coded JSON for readability
+- **Field highlighting**: Relevant fields being tested are highlighted in cyan/green
+- **Resource counts**: Shows number of resources found in search results
 
 Example output:
 ```

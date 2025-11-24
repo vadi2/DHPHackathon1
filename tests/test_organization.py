@@ -191,7 +191,8 @@ def run_organization_tests() -> TestResults:
 
         # Test 10: Read organization
         org_id = created_org['id']
-        response = make_request('GET', f'/Organization/{org_id}')
+        response = make_request('GET', f'/Organization/{org_id}',
+                              highlight_fields=['name', 'id', 'active'])
         if response.status_code == 200:
             results.add_pass("Read organization by ID")
             read_org = response.json()
@@ -202,7 +203,8 @@ def run_organization_tests() -> TestResults:
 
             response = make_request('PUT', f'/Organization/{org_id}',
                                   data=read_org,
-                                  headers={'If-Match': f'W/"{version}"'})
+                                  headers={'If-Match': f'W/"{version}"'},
+                                  highlight_fields=['name'])
             if response.status_code == 200:
                 results.add_pass("Update organization")
 

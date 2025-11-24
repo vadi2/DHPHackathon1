@@ -15,6 +15,8 @@ class Colors:
     BLUE = '\033[94m'
     RESET = '\033[0m'
     BOLD = '\033[1m'
+    CYAN = '\033[96m'
+    MAGENTA = '\033[95m'
 
 
 class TestResults:
@@ -54,9 +56,78 @@ class TestResults:
         return self.failed == 0
 
 
+def highlight_json_field(obj: Any, highlight_paths: List[str] = None, current_path: str = "") -> str:
+    """
+    Convert object to JSON string with highlighted paths.
+    highlight_paths: List of JSON paths to highlight (e.g., ['name', 'identifier[0].value'])
+    """
+    if highlight_paths is None:
+        highlight_paths = []
+
+    def should_highlight(path: str) -> bool:
+        """Check if current path matches any highlight pattern"""
+        for hp in highlight_paths:
+            # Simple match or prefix match
+            if path == hp or path.startswith(hp + ".") or hp.startswith(path + "."):
+                return True
+        return False
+
+    def format_value(val: Any, path: str, indent: int = 0) -> str:
+        """Recursively format value with highlighting"""
+        spaces = "  " * indent
+        highlighted = should_highlight(path)
+
+        if isinstance(val, dict):
+            if not val:
+                return "{}"
+            lines = ["{"]
+            for i, (k, v) in enumerate(val.items()):
+                new_path = f"{path}.{k}" if path else k
+                comma = "," if i < len(val) - 1 else ""
+                formatted_v = format_value(v, new_path, indent + 1)
+                key_color = Colors.CYAN if highlighted else ""
+                reset = Colors.RESET if highlighted else ""
+                lines.append(f"{spaces}  {key_color}\"{k}\"{reset}: {formatted_v}{comma}")
+            lines.append(f"{spaces}}}")
+            return "\n".join(lines)
+        elif isinstance(val, list):
+            if not val:
+                return "[]"
+            lines = ["["]
+            for i, item in enumerate(val):
+                new_path = f"{path}[{i}]"
+                comma = "," if i < len(val) - 1 else ""
+                formatted_item = format_value(item, new_path, indent + 1)
+                lines.append(f"{spaces}  {formatted_item}{comma}")
+            lines.append(f"{spaces}]")
+            return "\n".join(lines)
+        elif isinstance(val, str):
+            color = Colors.GREEN if highlighted else ""
+            reset = Colors.RESET if highlighted else ""
+            return f'{color}"{val}"{reset}'
+        elif isinstance(val, bool):
+            color = Colors.YELLOW if highlighted else ""
+            reset = Colors.RESET if highlighted else ""
+            return f"{color}{str(val).lower()}{reset}"
+        elif val is None:
+            return "null"
+        else:
+            color = Colors.MAGENTA if highlighted else ""
+            reset = Colors.RESET if highlighted else ""
+            return f"{color}{val}{reset}"
+
+    return format_value(obj, current_path)
+
+
 def make_request(method: str, endpoint: str, data: Optional[Dict] = None,
-                 headers: Optional[Dict] = None, params: Optional[Dict] = None) -> requests.Response:
-    """Make HTTP request to FHIR server"""
+                 headers: Optional[Dict] = None, params: Optional[Dict] = None,
+                 highlight_fields: List[str] = None) -> requests.Response:
+    """
+    Make HTTP request to FHIR server
+
+    Args:
+        highlight_fields: List of JSON paths to highlight in response (e.g., ['name', 'identifier[0].value'])
+    """
     url = f"{BASE_URL}/{endpoint.lstrip('/')}"
 
     default_headers = {'Content-Type': 'application/fhir+json'}
@@ -64,11 +135,12 @@ def make_request(method: str, endpoint: str, data: Optional[Dict] = None,
         default_headers.update(headers)
 
     if VERBOSE:
-        print(f"{Colors.BLUE}→{Colors.RESET} {method} {url}")
+        print(f"\n{Colors.BLUE}→{Colors.RESET} {method} {url}")
         if params:
-            print(f"  Params: {params}")
+            print(f"  {Colors.BOLD}Params:{Colors.RESET} {params}")
         if data:
-            print(f"  Data: {json.dumps(data, indent=2)[:200]}...")
+            print(f"  {Colors.BOLD}Request Data:{Colors.RESET}")
+            print("  " + json.dumps(data, indent=2).replace("\n", "\n  "))
 
     try:
         response = requests.request(
@@ -81,12 +153,17 @@ def make_request(method: str, endpoint: str, data: Optional[Dict] = None,
         )
 
         if VERBOSE:
-            print(f"{Colors.BLUE}←{Colors.RESET} Status: {response.status_code}")
+            print(f"{Colors.BLUE}←{Colors.RESET} {Colors.BOLD}Status:{Colors.RESET} {response.status_code}")
             if response.content:
                 try:
-                    print(f"  Response: {json.dumps(response.json(), indent=2)[:200]}...")
+                    resp_json = response.json()
+                    print(f"  {Colors.BOLD}Response:{Colors.RESET}")
+                    if highlight_fields:
+                        print("  " + highlight_json_field(resp_json, highlight_fields).replace("\n", "\n  "))
+                    else:
+                        print("  " + json.dumps(resp_json, indent=2).replace("\n", "\n  "))
                 except:
-                    print(f"  Response: {response.text[:200]}...")
+                    print(f"  {Colors.BOLD}Response:{Colors.RESET} {response.text}")
 
         return response
     except requests.exceptions.RequestException as e:
@@ -163,9 +240,11 @@ def assert_resource_exists(bundle: Dict, resource_type: str, test_name: str, res
     """Assert that search bundle contains at least one resource of given type"""
     resources = extract_entries(bundle, resource_type)
     if resources:
+        print(f"  {Colors.CYAN}→ Found {len(resources)} {resource_type} resource(s){Colors.RESET}")
         results.add_pass(test_name)
         return True
     else:
+        print(f"  {Colors.RED}→ No {resource_type} resources found in bundle{Colors.RESET}")
         results.add_fail(test_name, f"No {resource_type} resources found in bundle")
         return False
 
@@ -196,11 +275,32 @@ def assert_field_equals(resource: Dict, field_path: str, expected_value: Any, te
                 value = value[field]
 
         if value == expected_value:
+            print(f"  {Colors.CYAN}→ {field_path} = {Colors.GREEN}{value}{Colors.RESET}")
             results.add_pass(test_name)
             return True
         else:
+            print(f"  {Colors.RED}→ {field_path}: expected {expected_value}, got {value}{Colors.RESET}")
             results.add_fail(test_name, f"Expected {field_path}={expected_value}, got {value}")
             return False
     except (KeyError, IndexError, TypeError) as e:
+        print(f"  {Colors.RED}→ Field {field_path} not found: {e}{Colors.RESET}")
         results.add_fail(test_name, f"Field {field_path} not found: {e}")
         return False
+
+
+def get_field_value(obj: Dict, field_path: str) -> Any:
+    """
+    Extract value from nested object using dot notation
+    Example: get_field_value(obj, 'name[0].given[0]')
+    """
+    fields = field_path.split('.')
+    value = obj
+
+    for field in fields:
+        if '[' in field:
+            field_name, index = field.rstrip(']').split('[')
+            value = value[field_name][int(index)]
+        else:
+            value = value[field]
+
+    return value

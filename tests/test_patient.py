@@ -25,7 +25,7 @@ def run_patient_tests() -> TestResults:
     # Test 1: Search patient by PINFL
     response = make_request('GET', '/Patient', params={
         'identifier': 'https://dhp.uz/fhir/core/sid/pid/uz/ni|12345678901234'
-    })
+    }, highlight_fields=['entry[0].resource.identifier', 'entry[0].resource.name'])
     assert_status_code(response, 200, 'Search patient by PINFL identifier', results)
 
     # Test 2: Search patient by name
@@ -134,7 +134,8 @@ def run_patient_tests() -> TestResults:
         results.add_pass("Create patient")
 
         # Test 13: Read patient
-        response = make_request('GET', f'/Patient/{patient_id}')
+        response = make_request('GET', f'/Patient/{patient_id}',
+                              highlight_fields=['name', 'identifier', 'gender', 'birthDate'])
         if response.status_code == 200:
             results.add_pass("Read patient by ID")
             read_patient = response.json()
@@ -145,7 +146,8 @@ def run_patient_tests() -> TestResults:
 
             response = make_request('PUT', f'/Patient/{patient_id}',
                                   data=read_patient,
-                                  headers={'If-Match': f'W/"{version}"'})
+                                  headers={'If-Match': f'W/"{version}"'},
+                                  highlight_fields=['name[0].given'])
             if response.status_code == 200:
                 results.add_pass("Update patient")
 
