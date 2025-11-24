@@ -49,7 +49,7 @@ When data cannot be populated because it is unavailable in the source system, th
 - **birthDate**: Date of birth
 - **deceased[x]**: Death indicator (boolean) or date/time of death
 - **address**: Patient addresses with two types:
-  - **uzAddress**: Addresses in Uzbekistan (country code "UZ") with support for mahalla. **Must use coded values** from official registries for administrative divisions (state, district, city/mahalla)
+  - **uzAddress**: Addresses in Uzbekistan (country code "UZ") with support for mahalla. **Must use coded values** from official registries for administrative divisions: [state](https://dhp.uz/fhir/core/en/ValueSet-state-vs.html), [district](https://dhp.uz/fhir/core/en/ValueSet-regions-vs.html), [city/mahalla](https://dhp.uz/fhir/core/en/ValueSet-mahalla-vs.html)
   - **i18nAddress**: International addresses (non-Uzbekistan). Administrative divisions use free text without required valuesets
 - **maritalStatus**: Marital status (married, single, divorced, etc.)
 - **multipleBirth[x]**: Whether patient is part of a multiple birth
