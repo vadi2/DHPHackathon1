@@ -218,6 +218,12 @@ Below are examples of fetching and using the CapabilityStatement in various prog
       <a href="#javascript" data-toggle="tab">JavaScript</a>
     </li>
     <li>
+      <a href="#java" data-toggle="tab">Java</a>
+    </li>
+    <li>
+      <a href="#csharp" data-toggle="tab">C#</a>
+    </li>
+    <li>
       <a href="#go" data-toggle="tab">Go</a>
     </li>
   </ul>
@@ -376,6 +382,177 @@ function getSearchParameters(capability, resourceType) {
     console.error('Error:', error.message);
   }
 })();
+</code></pre>
+    </div>
+    <div class="tab-pane" id="java">
+<pre><code class="language-java">import org.hl7.fhir.r5.model.CapabilityStatement;
+import org.hl7.fhir.r5.model.CapabilityStatement.CapabilityStatementRestComponent;
+import org.hl7.fhir.r5.model.CapabilityStatement.CapabilityStatementRestResourceComponent;
+import org.hl7.fhir.r5.model.CapabilityStatement.ResourceInteractionComponent;
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class CapabilityExample {
+    private static final String BASE_URL = "https://playground.dhp.uz/fhir";
+    private static FhirContext ctx = FhirContext.forR5();
+    private static IGenericClient client = ctx.newRestfulGenericClient(BASE_URL);
+
+    public static CapabilityStatement getCapabilityStatement() {
+        return client.capabilities().ofType(CapabilityStatement.class).execute();
+    }
+
+    public static boolean isResourceSupported(CapabilityStatement capability, String resourceType) {
+        for (CapabilityStatementRestComponent rest : capability.getRest()) {
+            if (rest.getMode().toCode().equals("server")) {
+                for (CapabilityStatementRestResourceComponent resource : rest.getResource()) {
+                    if (resource.getType().equals(resourceType)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean isOperationSupported(CapabilityStatement capability,
+                                              String resourceType,
+                                              String operationName) {
+        for (CapabilityStatementRestComponent rest : capability.getRest()) {
+            if (rest.getMode().toCode().equals("server")) {
+                for (CapabilityStatementRestResourceComponent resource : rest.getResource()) {
+                    if (resource.getType().equals(resourceType)) {
+                        return resource.getOperation().stream()
+                            .anyMatch(op -> op.getName().equals(operationName));
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public static List&lt;String&gt; getSearchParameters(CapabilityStatement capability, String resourceType) {
+        List&lt;String&gt; params = new ArrayList&lt;&gt;();
+        for (CapabilityStatementRestComponent rest : capability.getRest()) {
+            if (rest.getMode().toCode().equals("server")) {
+                for (CapabilityStatementRestResourceComponent resource : rest.getResource()) {
+                    if (resource.getType().equals(resourceType)) {
+                        resource.getSearchParam().forEach(sp -> params.add(sp.getName()));
+                        return params;
+                    }
+                }
+            }
+        }
+        return params;
+    }
+
+    public static void main(String[] args) {
+        CapabilityStatement capability = getCapabilityStatement();
+
+        String serverDesc = capability.hasImplementation() ?
+            capability.getImplementation().getDescription() : "Unknown";
+        System.out.println("Server: " + serverDesc);
+        System.out.println("FHIR Version: " + capability.getFhirVersion().toCode());
+        System.out.println();
+
+        // Check resource support
+        System.out.println("Resource Support:");
+        System.out.println("  ValueSet: " + isResourceSupported(capability, "ValueSet"));
+        System.out.println("  CodeSystem: " + isResourceSupported(capability, "CodeSystem"));
+        System.out.println("  ConceptMap: " + isResourceSupported(capability, "ConceptMap"));
+        System.out.println();
+
+        // Check operation support
+        System.out.println("ValueSet Operations:");
+        System.out.println("  $expand: " + isOperationSupported(capability, "ValueSet", "expand"));
+        System.out.println("  $validate-code: " +
+            isOperationSupported(capability, "ValueSet", "validate-code"));
+        System.out.println();
+
+        // Get search parameters
+        List&lt;String&gt; params = getSearchParameters(capability, "ValueSet");
+        System.out.println("ValueSet search parameters: " +
+            String.join(", ", params.subList(0, Math.min(5, params.size()))) + "...");
+    }
+}
+</code></pre>
+    </div>
+    <div class="tab-pane" id="csharp">
+<pre><code class="language-csharp">using Hl7.Fhir.Model;
+using Hl7.Fhir.Rest;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+class CapabilityExample
+{
+    private const string BaseUrl = "https://playground.dhp.uz/fhir";
+    private static FhirClient client = new FhirClient(BaseUrl);
+
+    static CapabilityStatement GetCapabilityStatement()
+    {
+        return client.CapabilityStatement();
+    }
+
+    static bool IsResourceSupported(CapabilityStatement capability, string resourceType)
+    {
+        var rest = capability.Rest.FirstOrDefault(r => r.Mode == CapabilityStatement.RestfulCapabilityMode.Server);
+        if (rest == null) return false;
+
+        return rest.Resource.Any(r => r.Type.ToString() == resourceType);
+    }
+
+    static bool IsOperationSupported(CapabilityStatement capability, string resourceType, string operationName)
+    {
+        var rest = capability.Rest.FirstOrDefault(r => r.Mode == CapabilityStatement.RestfulCapabilityMode.Server);
+        if (rest == null) return false;
+
+        var resource = rest.Resource.FirstOrDefault(r => r.Type.ToString() == resourceType);
+        if (resource == null) return false;
+
+        return resource.Operation.Any(op => op.Name == operationName);
+    }
+
+    static List&lt;string&gt; GetSearchParameters(CapabilityStatement capability, string resourceType)
+    {
+        var rest = capability.Rest.FirstOrDefault(r => r.Mode == CapabilityStatement.RestfulCapabilityMode.Server);
+        if (rest == null) return new List&lt;string&gt;();
+
+        var resource = rest.Resource.FirstOrDefault(r => r.Type.ToString() == resourceType);
+        if (resource == null) return new List&lt;string&gt;();
+
+        return resource.SearchParam.Select(sp => sp.Name).ToList();
+    }
+
+    static void Main(string[] args)
+    {
+        var capability = GetCapabilityStatement();
+
+        var serverDesc = capability.Implementation?.Description ?? "Unknown";
+        Console.WriteLine($"Server: {serverDesc}");
+        Console.WriteLine($"FHIR Version: {capability.FhirVersion}");
+        Console.WriteLine();
+
+        // Check resource support
+        Console.WriteLine("Resource Support:");
+        Console.WriteLine($"  ValueSet: {IsResourceSupported(capability, "ValueSet")}");
+        Console.WriteLine($"  CodeSystem: {IsResourceSupported(capability, "CodeSystem")}");
+        Console.WriteLine($"  ConceptMap: {IsResourceSupported(capability, "ConceptMap")}");
+        Console.WriteLine();
+
+        // Check operation support
+        Console.WriteLine("ValueSet Operations:");
+        Console.WriteLine($"  $expand: {IsOperationSupported(capability, "ValueSet", "expand")}");
+        Console.WriteLine($"  $validate-code: {IsOperationSupported(capability, "ValueSet", "validate-code")}");
+        Console.WriteLine();
+
+        // Get search parameters
+        var params = GetSearchParameters(capability, "ValueSet");
+        Console.WriteLine($"ValueSet search parameters: {string.Join(", ", params.Take(5))}...");
+    }
+}
 </code></pre>
     </div>
     <div class="tab-pane" id="go">
