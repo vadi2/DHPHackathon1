@@ -294,7 +294,6 @@ The `$expand` operation expands a ValueSet to return the actual list of codes. T
 - `count`: Maximum number of codes to return
 - `offset`: Offset for pagination
 - `filter`: Text filter to match code display names
-- `displayLanguage`: Language for displays (e.g., `uz`, `ru`, `en`)
 
 **Example 1: Basic expansion**
 ```
@@ -422,7 +421,6 @@ The `$lookup` operation retrieves details about a specific code in a CodeSystem.
 - `system`: The CodeSystem URL (required)
 - `code`: The code to look up (required)
 - `version`: Specific version of the CodeSystem
-- `displayLanguage`: Preferred language for display
 
 **Example:**
 ```
@@ -646,7 +644,7 @@ From the artifacts page, we find the ValueSet URL: `https://terminology.dhp.uz/f
 **Step 2: Expand the ValueSet to populate the dropdown**
 
 ```
-GET /ValueSet/$expand?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs&displayLanguage=uz&count=100
+GET /ValueSet/$expand?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs&count=100
 ```
 
 Response gives us all codes to populate the dropdown:
@@ -726,8 +724,6 @@ This returns all available designations (translations).
 4. **Use version binding**: In production, pin to specific ValueSet versions to ensure consistency.
 
 5. **Handle missing codes gracefully**: If a code isn't found during lookup, handle it gracefully rather than failing.
-
-6. **Support multiple languages**: Use the `displayLanguage` parameter to get displays in the user's preferred language.
 
 ## Error handling
 
@@ -904,7 +900,6 @@ GET /ValueSet/$expand?url=https://terminology.dhp.uz/fhir/core/ValueSet/gender-o
 Questions to explore:
 - How many codes are in this ValueSet?
 - What do the different codes mean?
-- Try expanding with `displayLanguage=ru` - what changes?
 
 **Exercise 4: Validate a code**
 
@@ -1098,13 +1093,12 @@ from typing import List, Dict
 # FHIR server base URL
 base_url = "https://playground.dhp.uz/fhir"
 
-def expand_valueset(valueset_url: str, language: str = "uz") -> List[Dict]:
+def expand_valueset(valueset_url: str) -> List[Dict]:
     """Expand a ValueSet to get all codes."""
     response = requests.get(
         f"{base_url}/ValueSet/$expand",
         params={
-            "url": valueset_url,
-            "displayLanguage": language
+            "url": valueset_url
         },
         headers={"Accept": "application/fhir+json"}
     )
@@ -1177,10 +1171,9 @@ print(f"  Details: {details}")
 <pre><code class="language-javascript">// Using fetch API
 const baseUrl = "https://playground.dhp.uz/fhir";
 
-async function expandValueSet(valueSetUrl, language = "uz") {
+async function expandValueSet(valueSetUrl) {
   const params = new URLSearchParams({
-    url: valueSetUrl,
-    displayLanguage: language
+    url: valueSetUrl
   });
 
   const response = await fetch(`${baseUrl}/ValueSet/$expand?${params}`, {

@@ -294,7 +294,6 @@ FHIR определяет несколько операций специальн
 - `count`: Максимальное количество возвращаемых кодов
 - `offset`: Смещение для пагинации
 - `filter`: Текстовый фильтр для сопоставления отображаемых имён кодов
-- `displayLanguage`: Язык для отображения (например, `uz`, `ru`, `en`)
 
 **Пример 1: Базовое расширение**
 ```
@@ -422,7 +421,6 @@ GET /ValueSet/$validate-code?url=https://terminology.dhp.uz/fhir/core/ValueSet/p
 - `system`: URL CodeSystem (обязателен)
 - `code`: Код для поиска (обязателен)
 - `version`: Конкретная версия CodeSystem
-- `displayLanguage`: Предпочитаемый язык для отображения
 
 **Пример:**
 ```
@@ -646,7 +644,7 @@ Content-Type: application/fhir+json
 **Шаг 2: Расширить ValueSet для заполнения выпадающего списка**
 
 ```
-GET /ValueSet/$expand?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs&displayLanguage=uz&count=100
+GET /ValueSet/$expand?url=https://terminology.dhp.uz/fhir/core/ValueSet/position-and-profession-vs&count=100
 ```
 
 Ответ даёт нам все коды для заполнения выпадающего списка:
@@ -726,8 +724,6 @@ GET /CodeSystem/$lookup?system=https://terminology.dhp.uz/fhir/core/CodeSystem/p
 4. **Используйте привязку версий**: В продакшн привязывайтесь к конкретным версиям ValueSet для обеспечения согласованности.
 
 5. **Обрабатывайте отсутствующие коды gracefully**: Если код не найден во время поиска, обработайте это gracefully, а не падайте с ошибкой.
-
-6. **Поддерживайте несколько языков**: Используйте параметр `displayLanguage` для получения отображений на предпочитаемом языке пользователя.
 
 ## Обработка ошибок
 
@@ -904,7 +900,6 @@ GET /ValueSet/$expand?url=https://terminology.dhp.uz/fhir/core/ValueSet/gender-o
 Вопросы для изучения:
 - Сколько кодов в этом ValueSet?
 - Что означают разные коды?
-- Попробуйте расширить с `displayLanguage=ru` - что изменилось?
 
 **Упражнение 4: Валидировать код**
 
@@ -1098,13 +1093,12 @@ from typing import List, Dict
 # Базовый URL FHIR сервера
 base_url = "https://playground.dhp.uz/fhir"
 
-def expand_valueset(valueset_url: str, language: str = "uz") -> List[Dict]:
+def expand_valueset(valueset_url: str) -> List[Dict]:
     """Расширить ValueSet для получения всех кодов."""
     response = requests.get(
         f"{base_url}/ValueSet/$expand",
         params={
-            "url": valueset_url,
-            "displayLanguage": language
+            "url": valueset_url
         },
         headers={"Accept": "application/fhir+json"}
     )
@@ -1177,10 +1171,9 @@ print(f"  Детали: {details}")
 <pre><code class="language-javascript">// Используя fetch API
 const baseUrl = "https://playground.dhp.uz/fhir";
 
-async function expandValueSet(valueSetUrl, language = "uz") {
+async function expandValueSet(valueSetUrl) {
   const params = new URLSearchParams({
-    url: valueSetUrl,
-    displayLanguage: language
+    url: valueSetUrl
   });
 
   const response = await fetch(`${baseUrl}/ValueSet/$expand?${params}`, {
