@@ -197,8 +197,10 @@ def run_practitioner_tests() -> TestResults:
     response = make_request('GET', '/Organization', params={'_count': '1'})
     if response.status_code == 200:
         bundle = response.json()
-        if bundle.get('total', 0) > 0:
-            org_id = bundle['entry'][0]['resource']['id']
+        entries = bundle.get('entry', [])
+        org_entries = [e for e in entries if e.get('resource', {}).get('resourceType') == 'Organization']
+        if len(org_entries) > 0:
+            org_id = org_entries[0]['resource']['id']
 
             response = make_request('GET', '/PractitionerRole', params={
                 'organization': f'Organization/{org_id}'

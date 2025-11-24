@@ -176,7 +176,8 @@ def run_patient_tests() -> TestResults:
     })
     if response.status_code == 200:
         bundle = response.json()
-        if bundle.get('total', 0) == 0 or len(extract_entries(bundle, 'Patient')) == 0:
+        patient_entries = extract_entries(bundle, 'Patient')
+        if len(patient_entries) == 0:
             results.add_pass("Search before create (no duplicate found)")
 
             # Create the patient
@@ -225,7 +226,8 @@ def run_patient_tests() -> TestResults:
                 })
                 if response.status_code == 200:
                     bundle = response.json()
-                    if bundle.get('total', 0) > 0 or len(extract_entries(bundle, 'Patient')) > 0:
+                    patient_entries = extract_entries(bundle, 'Patient')
+                    if len(patient_entries) > 0:
                         results.add_pass("Search after create (duplicate detected)")
                     else:
                         results.add_fail("Search after create", "Created patient not found")

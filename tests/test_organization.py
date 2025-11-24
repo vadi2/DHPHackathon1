@@ -73,11 +73,14 @@ def run_organization_tests() -> TestResults:
     })
     if response.status_code == 200:
         bundle = response.json()
-        # Note: This might not find anything if the org doesn't exist, which is okay
-        if bundle.get('total', 0) > 0:
+        # Check if we found any organizations (check entry array - total field not reliable on this server)
+        entries = bundle.get('entry', [])
+        org_entries = [e for e in entries if e.get('resource', {}).get('resourceType') == 'Organization']
+        if len(org_entries) > 0:
+            print(f"  {Colors.CYAN}→ Found {len(org_entries)} organization(s){Colors.RESET}")
             results.add_pass("Search organization by soliq ID")
         else:
-            results.add_skip("Search organization by soliq ID", "No org with test ID found (expected)")
+            results.add_skip("Search organization by soliq ID", "No org with test ID found")
     else:
         results.add_fail("Search organization by soliq ID", f"Status {response.status_code}")
 
@@ -136,8 +139,10 @@ def run_organization_tests() -> TestResults:
     response = make_request('GET', '/Organization', params={'type': 'prov', '_count': '1'})
     if response.status_code == 200:
         bundle = response.json()
-        if bundle.get('total', 0) > 0:
-            parent_org_id = bundle['entry'][0]['resource']['id']
+        entries = bundle.get('entry', [])
+        org_entries = [e for e in entries if e.get('resource', {}).get('resourceType') == 'Organization']
+        if len(org_entries) > 0:
+            parent_org_id = org_entries[0]['resource']['id']
             response = make_request('GET', '/Organization', params={
                 'partof': f'Organization/{parent_org_id}'
             })
