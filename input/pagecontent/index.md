@@ -4,8 +4,8 @@
 
 Welcome to the first Digital Health Platform (DHP) Connectathon! This event focuses on testing and integrating with two core components of the Uzbekistan health information system:
 
-- **MSM (Metadata and Security Management)**: Understanding server capabilities and terminology services
-- **MDM (Master Data Management)**: Working with healthcare master data including organizations, patients, and practitioners
+- **MSM (Metadata and Security Management)**: understanding server capabilities and terminology services
+- **MDM (Master Data Management)**: working with healthcare master data including organizations, patients, and practitioners
 
 Future connectathons will expand to additional DHP components as they become available for integration.
 
@@ -67,7 +67,7 @@ graph TB
 #### [Patient Registration](patient-registration.html)
 Handle patient records with proper identifiers (PINFL), duplicate detection, and matching logic.
 
-Skills: Patient search and matching, duplicate detection, data quality
+Skills: patient search and matching, duplicate detection, data quality
 
 #### [Organization Management](organization-management.html)
 Manage healthcare organizations and departments.
@@ -77,12 +77,12 @@ Skills: CRUD operations, search, references, identifiers, hierarchies
 #### [Practitioner and PractitionerRole Management](practitioner-practitionerrole-management.html)
 Work with healthcare providers and understand multi-resource relationships.
 
-Skills: Managing related resources, organizational relationships, qualifications
+Skills: managing related resources, organizational relationships, qualifications
 
 #### [Discovering Server Capabilities](capability-discovery.html)
 Learn how to query what the FHIR server supports.
 
-Skills: Understanding CapabilityStatement, checking supported resources and operations
+Skills: understanding CapabilityStatement, checking supported resources and operations
 
 #### [Terminology Basics](terminology-basics.html)
 Learn to work with medical coding systems and terminology services.
@@ -94,18 +94,18 @@ Skills: CodeSystem, ValueSet, ConceptMap, $expand, $validate-code, $lookup opera
 Technical requirements:
 - HTTP client or programming language of your choice (we provide examples in cURL, Python, JavaScript, Java, C#, and Go)
 - JSON knowledge
-- Basic understanding of RESTful APIs
+- basic understanding of RESTful APIs
 
 No prior FHIR experience required - our scenarios are designed for beginners!
 
 ### What's next
 
 This is the first of many connectathons. As the Digital Health Platform grows, future events will cover:
-- Clinical data management (encounters, observations, diagnostic reports)
-- Medication management
-- Scheduling and appointments
-- Laboratory and imaging integration
-- Public health reporting
+- clinical data management (encounters, observations, diagnostic reports)
+- medication management
+- scheduling and appointments
+- laboratory and imaging integration
+- public health reporting
 - And more...
 
 Stay tuned for announcements as new components become available!
