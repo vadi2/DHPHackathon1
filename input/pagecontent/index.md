@@ -20,7 +20,6 @@ Key concepts:
 - **Terminology**: Standardized code systems and value sets for consistent data representation
 
 Base URL for testing: `https://playground.dhp.uz/fhir`
-- Note: This is a temporary URL that will be replaced closer to the connectathon
 
 ### What you'll learn
 

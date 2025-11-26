@@ -7,7 +7,6 @@
 - Ресурсы: Patient
 - Навыки: Поиск и сопоставление, логика обнаружения дубликатов
 - Базовый URL: `https://playground.dhp.uz/fhir`
-  - **Примечание:** Это временный URL, который будет заменён на финальный ближе к коннектафону
 - Профиль: [uz-core-patient](https://dhp.uz/fhir/core/en/StructureDefinition-uz-core-patient.html)
 
 **Обратная связь:** Поделитесь своим опытом, проблемами и успехами в [документе коннектафона](https://docs.google.com/document/d/1PdQ8zBI9xkISP3tAqIK8-TGMql3kVVZ4UNoHVYqCy4Y/edit?usp=sharing).

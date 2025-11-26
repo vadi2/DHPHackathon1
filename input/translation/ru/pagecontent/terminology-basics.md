@@ -7,7 +7,6 @@
 - Ресурсы: CodeSystem, ValueSet, ConceptMap
 - Навыки: Параметры поиска, фильтрация, операции терминологии ($expand, $validate-code, $lookup), управление версиями
 - Базовый URL: `https://playground.dhp.uz/fhir`
-  - **Примечание:** Это временный URL, который будет заменён на финальный ближе к коннектафону
 - Полезные ссылки:
   - [FHIR Terminology Service](http://hl7.org/fhir/R5/terminology-service.html)
   - [uz-core Артефакты](https://dhp.uz/fhir/core/en/artifacts.html)

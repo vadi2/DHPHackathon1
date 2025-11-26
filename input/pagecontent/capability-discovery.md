@@ -7,7 +7,6 @@ Goal: Learn how to retrieve and use the CapabilityStatement to understand what r
 - Resources: CapabilityStatement
 - Skills: GET requests, JSON navigation
 - Base URL: `https://playground.dhp.uz/fhir`
-  - **Note:** This is a temporary URL that will be replaced with the final one closer to the connectathon
 - Useful links:
   - [FHIR CapabilityStatement](http://hl7.org/fhir/R5/capabilitystatement.html)
   - [DHPCapabilityStatement](https://dhp.uz/fhir/core/en/CapabilityStatement-DHPCapabilityStatement.html)

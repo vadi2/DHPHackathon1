@@ -7,7 +7,6 @@ Goal: Retrieve existing organizations and departments, integrate them into softw
 - Resources: Organization
 - Skills: GET/POST/PUT/DELETE operations, search, references, identifiers
 - Base URL: `https://playground.dhp.uz/fhir`
-  - **Note:** This is a temporary URL that will be replaced with the final one closer to the connectathon
 - Profile: [uz-core-organization](https://dhp.uz/fhir/core/en/StructureDefinition-uz-core-organization.html)
 
 **Feedback:** Share your experience, issues and successes in the [connectathon document](https://docs.google.com/document/d/1PdQ8zBI9xkISP3tAqIK8-TGMql3kVVZ4UNoHVYqCy4Y/edit?usp=sharing).

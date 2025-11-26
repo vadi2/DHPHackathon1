@@ -7,7 +7,6 @@ Goal: Learn to search and retrieve terminology resources (CodeSystem, ValueSet, 
 - Resources: CodeSystem, ValueSet, ConceptMap
 - Skills: Search parameters, filtering, terminology operations ($expand, $validate-code, $lookup), version management
 - Base URL: `https://playground.dhp.uz/fhir`
-  - **Note:** This is a temporary URL that will be replaced with the final one closer to the connectathon
 - Useful links:
   - [FHIR Terminology Service](http://hl7.org/fhir/R5/terminology-service.html)
   - [uz-core Artifacts](https://dhp.uz/fhir/core/en/artifacts.html)

@@ -7,7 +7,6 @@
 - Ресурсы: Practitioner, PractitionerRole
 - Навыки: GET/POST/PUT/DELETE операции, поиск, ссылки, идентификаторы
 - Базовый URL: `https://playground.dhp.uz/fhir`
-  - **Примечание:** Это временный URL, который будет заменён на финальный ближе к коннектафону
 - Профили:
   - [uz-core-practitioner](https://dhp.uz/fhir/core/en/StructureDefinition-uz-core-practitioner.html)
   - [uz-core-practitionerrole](https://dhp.uz/fhir/core/en/StructureDefinition-uz-core-practitionerrole.html)
