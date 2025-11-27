@@ -25,6 +25,7 @@ Base URL for testing: `https://playground.dhp.uz/fhir`
 
 This connectathon will help you:
 
+1. Authenticate - Connect to the DHP platform using OAuth 2.0 client credentials
 1. Register patients - Handle patient records with duplicate detection and matching
 1. Manage organizations - Create, read, update, delete, and search healthcare organizations
 1. Manage practitioners - Work with healthcare providers and their roles in organizations
@@ -38,6 +39,7 @@ We've prepared detailed scenarios to guide you through each integration task. Ch
 ```mermaid
 graph TB
     subgraph MSM["Metadata and Security Management"]
+        Auth[Authentication]
         Cap[Capability Discovery]
         Term[Terminology Basics]
     end
@@ -48,7 +50,7 @@ graph TB
         Prac[Practitioner /<br/>PractitionerRole]
     end
 
-    Term -.-> MDM
+    MSM -.-> MDM
 
     Org --> Pat
     Org --> Prac
@@ -56,12 +58,18 @@ graph TB
 
     style MSM fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
     style MDM fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style Auth fill:#bbdefb,stroke:#1976d2
     style Cap fill:#bbdefb,stroke:#1976d2
     style Term fill:#bbdefb,stroke:#1976d2
     style Org fill:#ffe0b2,stroke:#f57c00
     style Pat fill:#ffe0b2,stroke:#f57c00
     style Prac fill:#ffe0b2,stroke:#f57c00
 ```
+
+#### [Authentication](authentication.html)
+Connect your application to the DHP platform using OAuth 2.0 client credentials flow.
+
+Skills: OAuth 2.0, token management, authenticated API requests
 
 #### [Patient Registration](patient-registration.html)
 Handle patient records with proper identifiers (PINFL), duplicate detection, and matching logic.

@@ -84,6 +84,7 @@ parameters:
 # ╰────────────────────────────────────────────────────────────────────────────────────────────────╯
 menu:
   Home: index.html
+  Authentication: authentication.html
   Patients: patient-registration.html
   Organizations: organization-management.html
   Practitioners: practitioner-practitionerrole-management.html
