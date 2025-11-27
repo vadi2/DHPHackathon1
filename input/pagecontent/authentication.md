@@ -183,64 +183,31 @@ curl "https://playground.dhp.uz/fhir/Patient?_count=5" \
 </code></pre>
     </div>
     <div class="tab-pane" id="python">
-<pre><code class="language-python">import requests
-from datetime import datetime, timedelta
+<pre><code class="language-python"># pip install requests-oauthlib
+from oauthlib.oauth2 import BackendApplicationClient
+from requests_oauthlib import OAuth2Session
 
-class DHPClient:
-    def __init__(self, client_id: str, client_secret: str):
-        self.client_id = client_id
-        self.client_secret = client_secret
-        self.sso_url = "https://sso.dhp.uz"
-        self.fhir_url = "https://playground.dhp.uz/fhir"
-        self.access_token = None
-        self.token_expires_at = None
+SSO_URL = "https://sso.dhp.uz"
+FHIR_URL = "https://playground.dhp.uz/fhir"
+CLIENT_ID = "your_client_id"
+CLIENT_SECRET = "your_client_secret"
 
-    def get_access_token(self) -> str:
-        """Get a valid access token, refreshing if necessary."""
-        if self.access_token and self.token_expires_at:
-            if datetime.now() < self.token_expires_at - timedelta(seconds=60):
-                return self.access_token
+# Create OAuth2 session with client credentials
+client = BackendApplicationClient(client_id=CLIENT_ID)
+oauth = OAuth2Session(client=client)
 
-        response = requests.post(
-            f"{self.sso_url}/oauth/token",
-            data={
-                "grant_type": "client_credentials",
-                "client_id": self.client_id,
-                "client_secret": self.client_secret
-            },
-            headers={"Content-Type": "application/x-www-form-urlencoded"}
-        )
-        response.raise_for_status()
-
-        token_data = response.json()
-        self.access_token = token_data["access_token"]
-        expires_in = token_data.get("expires_in", 3600)
-        self.token_expires_at = datetime.now() + timedelta(seconds=expires_in)
-
-        return self.access_token
-
-    def request(self, method: str, endpoint: str, **kwargs) -> dict:
-        """Make an authenticated request to the FHIR API."""
-        token = self.get_access_token()
-        headers = kwargs.pop("headers", {})
-        headers["Authorization"] = f"Bearer {token}"
-        headers["Accept"] = "application/fhir+json"
-
-        url = f"{self.fhir_url}/{endpoint}"
-        response = requests.request(method, url, headers=headers, **kwargs)
-        response.raise_for_status()
-
-        return response.json()
-
-
-# Example usage
-client = DHPClient(
-    client_id="your_client_id",
-    client_secret="your_client_secret"
+# Fetch token (session will auto-refresh when needed)
+oauth.fetch_token(
+    token_url=f"{SSO_URL}/oauth/token",
+    client_id=CLIENT_ID,
+    client_secret=CLIENT_SECRET
 )
 
-# Search for patients
-patients = client.request("GET", "Patient", params={"_count": 5})
+# Make authenticated request - token is automatically included
+response = oauth.get(f"{FHIR_URL}/Patient", params={"_count": 5})
+response.raise_for_status()
+patients = response.json()
+
 print(f"Found {patients.get('total', 0)} patients")
 
 for entry in patients.get("entry", []):
@@ -335,96 +302,58 @@ for entry in patients.get("entry", []):
 </code></pre>
     </div>
     <div class="tab-pane" id="java">
-<pre><code class="language-java">import java.net.URI;
+<pre><code class="language-java">// Add to pom.xml: com.github.scribejava:scribejava-apis:8.3.3
+import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Instant;
-import java.time.Duration;
+import com.github.scribejava.core.builder.ServiceBuilder;
+import com.github.scribejava.core.builder.api.DefaultApi20;
+import com.github.scribejava.core.model.OAuth2AccessToken;
+import com.github.scribejava.core.oauth.OAuth20Service;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class DHPClient {
-    private final String clientId;
-    private final String clientSecret;
-    private final String ssoUrl = "https://sso.dhp.uz";
-    private final String fhirUrl = "https://playground.dhp.uz/fhir";
-    private final HttpClient httpClient;
+public class DHPExample {
+    static final String SSO_URL = "https://sso.dhp.uz";
+    static final String FHIR_URL = "https://playground.dhp.uz/fhir";
 
-    private String accessToken;
-    private Instant tokenExpiresAt;
-
-    public DHPClient(String clientId, String clientSecret) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.httpClient = HttpClient.newHttpClient();
-    }
-
-    public String getAccessToken() throws Exception {
-        // Return cached token if still valid
-        if (accessToken != null && tokenExpiresAt != null) {
-            if (Instant.now().isBefore(tokenExpiresAt.minus(Duration.ofSeconds(60)))) {
-                return accessToken;
-            }
+    // Define DHP OAuth2 API
+    static class DHPApi extends DefaultApi20 {
+        @Override
+        public String getAccessTokenEndpoint() {
+            return SSO_URL + "/oauth/token";
         }
 
-        String requestBody = String.format(
-            "grant_type=client_credentials&client_id=%s&client_secret=%s",
-            clientId, clientSecret
-        );
+        @Override
+        protected String getAuthorizationBaseUrl() {
+            return SSO_URL + "/oauth/authorize";
+        }
+    }
 
+    public static void main(String[] args) throws Exception {
+        // Create OAuth2 service
+        OAuth20Service service = new ServiceBuilder("your_client_id")
+            .apiSecret("your_client_secret")
+            .build(new DHPApi());
+
+        // Get access token using client credentials
+        OAuth2AccessToken token = service.getAccessTokenClientCredentialsGrant();
+
+        // Make authenticated request
+        HttpClient httpClient = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(ssoUrl + "/oauth/token"))
-            .header("Content-Type", "application/x-www-form-urlencoded")
-            .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+            .uri(URI.create(FHIR_URL + "/Patient?_count=5"))
+            .header("Authorization", "Bearer " + token.getAccessToken())
+            .header("Accept", "application/fhir+json")
+            .GET()
             .build();
 
         HttpResponse&lt;String&gt; response = httpClient.send(
             request, HttpResponse.BodyHandlers.ofString()
         );
 
-        if (response.statusCode() != 200) {
-            throw new RuntimeException("Authentication failed: " + response.statusCode());
-        }
-
-        JsonObject tokenData = JsonParser.parseString(response.body()).getAsJsonObject();
-        accessToken = tokenData.get("access_token").getAsString();
-        int expiresIn = tokenData.has("expires_in")
-            ? tokenData.get("expires_in").getAsInt()
-            : 3600;
-        tokenExpiresAt = Instant.now().plus(Duration.ofSeconds(expiresIn));
-
-        return accessToken;
-    }
-
-    public String request(String method, String endpoint) throws Exception {
-        String token = getAccessToken();
-
-        HttpRequest.Builder builder = HttpRequest.newBuilder()
-            .uri(URI.create(fhirUrl + "/" + endpoint))
-            .header("Authorization", "Bearer " + token)
-            .header("Accept", "application/fhir+json");
-
-        if ("GET".equals(method)) {
-            builder.GET();
-        }
-
-        HttpResponse&lt;String&gt; response = httpClient.send(
-            builder.build(), HttpResponse.BodyHandlers.ofString()
-        );
-
-        if (response.statusCode() != 200) {
-            throw new RuntimeException("API request failed: " + response.statusCode());
-        }
-
-        return response.body();
-    }
-
-    public static void main(String[] args) throws Exception {
-        DHPClient client = new DHPClient("your_client_id", "your_client_secret");
-
-        String patientsJson = client.request("GET", "Patient?_count=5");
-        JsonObject patients = JsonParser.parseString(patientsJson).getAsJsonObject();
+        JsonObject patients = JsonParser.parseString(response.body()).getAsJsonObject();
 
         int total = patients.has("total") ? patients.get("total").getAsInt() : 0;
         System.out.println("Found " + total + " patients");
@@ -448,101 +377,57 @@ public class DHPClient {
 </code></pre>
     </div>
     <div class="tab-pane" id="csharp">
-<pre><code class="language-csharp">using System;
+<pre><code class="language-csharp">// Install: dotnet add package IdentityModel
+using System;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using IdentityModel.Client;
 
-public class DHPClient
+const string ssoUrl = "https://sso.dhp.uz";
+const string fhirUrl = "https://playground.dhp.uz/fhir";
+
+var client = new HttpClient();
+
+// Get access token
+var tokenResponse = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
 {
-    private readonly string _clientId;
-    private readonly string _clientSecret;
-    private readonly string _ssoUrl = "https://sso.dhp.uz";
-    private readonly string _fhirUrl = "https://playground.dhp.uz/fhir";
-    private readonly HttpClient _httpClient;
+    Address = $"{ssoUrl}/oauth/token",
+    ClientId = "your_client_id",
+    ClientSecret = "your_client_secret"
+});
 
-    private string _accessToken;
-    private DateTime? _tokenExpiresAt;
+if (tokenResponse.IsError)
+{
+    Console.WriteLine($"Error: {tokenResponse.Error}");
+    return;
+}
 
-    public DHPClient(string clientId, string clientSecret)
+// Set bearer token for subsequent requests
+client.SetBearerToken(tokenResponse.AccessToken);
+
+// Make authenticated request
+var response = await client.GetAsync($"{fhirUrl}/Patient?_count=5");
+response.EnsureSuccessStatusCode();
+
+var json = await response.Content.ReadAsStringAsync();
+var root = JsonDocument.Parse(json).RootElement;
+
+var total = root.TryGetProperty("total", out var t) ? t.GetInt32() : 0;
+Console.WriteLine($"Found {total} patients");
+
+if (root.TryGetProperty("entry", out var entries))
+{
+    foreach (var entry in entries.EnumerateArray())
     {
-        _clientId = clientId;
-        _clientSecret = clientSecret;
-        _httpClient = new HttpClient();
-    }
-
-    public async Task&lt;string&gt; GetAccessTokenAsync()
-    {
-        // Return cached token if still valid
-        if (_accessToken != null && _tokenExpiresAt.HasValue)
+        var patient = entry.GetProperty("resource");
+        if (patient.TryGetProperty("name", out var names))
         {
-            if (DateTime.UtcNow < _tokenExpiresAt.Value.AddSeconds(-60))
-            {
-                return _accessToken;
-            }
-        }
-
-        var content = new FormUrlEncodedContent(new[]
-        {
-            new KeyValuePair&lt;string, string&gt;("grant_type", "client_credentials"),
-            new KeyValuePair&lt;string, string&gt;("client_id", _clientId),
-            new KeyValuePair&lt;string, string&gt;("client_secret", _clientSecret)
-        });
-
-        var response = await _httpClient.PostAsync($"{_ssoUrl}/oauth/token", content);
-        response.EnsureSuccessStatusCode();
-
-        var json = await response.Content.ReadAsStringAsync();
-        var tokenData = JsonDocument.Parse(json).RootElement;
-
-        _accessToken = tokenData.GetProperty("access_token").GetString();
-        var expiresIn = tokenData.TryGetProperty("expires_in", out var exp)
-            ? exp.GetInt32()
-            : 3600;
-        _tokenExpiresAt = DateTime.UtcNow.AddSeconds(expiresIn);
-
-        return _accessToken;
-    }
-
-    public async Task&lt;JsonDocument&gt; RequestAsync(string method, string endpoint)
-    {
-        var token = await GetAccessTokenAsync();
-
-        var request = new HttpRequestMessage(new HttpMethod(method), $"{_fhirUrl}/{endpoint}");
-        request.Headers.Add("Authorization", $"Bearer {token}");
-        request.Headers.Add("Accept", "application/fhir+json");
-
-        var response = await _httpClient.SendAsync(request);
-        response.EnsureSuccessStatusCode();
-
-        var json = await response.Content.ReadAsStringAsync();
-        return JsonDocument.Parse(json);
-    }
-
-    public static async Task Main(string[] args)
-    {
-        var client = new DHPClient("your_client_id", "your_client_secret");
-
-        var patients = await client.RequestAsync("GET", "Patient?_count=5");
-        var root = patients.RootElement;
-
-        var total = root.TryGetProperty("total", out var t) ? t.GetInt32() : 0;
-        Console.WriteLine($"Found {total} patients");
-
-        if (root.TryGetProperty("entry", out var entries))
-        {
-            foreach (var entry in entries.EnumerateArray())
-            {
-                var patient = entry.GetProperty("resource");
-                if (patient.TryGetProperty("name", out var names))
-                {
-                    var name = names[0];
-                    var family = name.TryGetProperty("family", out var f)
-                        ? f.GetString()
-                        : "Unknown";
-                    Console.WriteLine($"  - {family}");
-                }
-            }
+            var name = names[0];
+            var family = name.TryGetProperty("family", out var f)
+                ? f.GetString()
+                : "Unknown";
+            Console.WriteLine($"  - {family}");
         }
     }
 }
@@ -552,143 +437,54 @@ public class DHPClient
 <pre><code class="language-go">package main
 
 import (
+    "context"
     "encoding/json"
     "fmt"
     "io"
-    "net/http"
-    "net/url"
-    "strings"
-    "sync"
-    "time"
+
+    "golang.org/x/oauth2/clientcredentials"
 )
 
-type DHPClient struct {
-    ClientID     string
-    ClientSecret string
-    SSOUrl       string
-    FHIRUrl      string
-
-    accessToken    string
-    tokenExpiresAt time.Time
-    mu             sync.Mutex
-}
-
-type TokenResponse struct {
-    AccessToken string `json:"access_token"`
-    TokenType   string `json:"token_type"`
-    ExpiresIn   int    `json:"expires_in"`
-}
-
-func NewDHPClient(clientID, clientSecret string) *DHPClient {
-    return &DHPClient{
-        ClientID:     clientID,
-        ClientSecret: clientSecret,
-        SSOUrl:       "https://sso.dhp.uz",
-        FHIRUrl:      "https://playground.dhp.uz/fhir",
-    }
-}
-
-func (c *DHPClient) GetAccessToken() (string, error) {
-    c.mu.Lock()
-    defer c.mu.Unlock()
-
-    // Return cached token if still valid
-    if c.accessToken != "" && time.Now().Before(c.tokenExpiresAt.Add(-60*time.Second)) {
-        return c.accessToken, nil
-    }
-
-    data := url.Values{}
-    data.Set("grant_type", "client_credentials")
-    data.Set("client_id", c.ClientID)
-    data.Set("client_secret", c.ClientSecret)
-
-    resp, err := http.Post(
-        c.SSOUrl+"/oauth/token",
-        "application/x-www-form-urlencoded",
-        strings.NewReader(data.Encode()),
-    )
-    if err != nil {
-        return "", err
-    }
-    defer resp.Body.Close()
-
-    if resp.StatusCode != 200 {
-        return "", fmt.Errorf("authentication failed: %d", resp.StatusCode)
-    }
-
-    body, err := io.ReadAll(resp.Body)
-    if err != nil {
-        return "", err
-    }
-
-    var tokenResp TokenResponse
-    if err := json.Unmarshal(body, &tokenResp); err != nil {
-        return "", err
-    }
-
-    c.accessToken = tokenResp.AccessToken
-    expiresIn := tokenResp.ExpiresIn
-    if expiresIn == 0 {
-        expiresIn = 3600
-    }
-    c.tokenExpiresAt = time.Now().Add(time.Duration(expiresIn) * time.Second)
-
-    return c.accessToken, nil
-}
-
-func (c *DHPClient) Request(method, endpoint string) (map[string]interface{}, error) {
-    token, err := c.GetAccessToken()
-    if err != nil {
-        return nil, err
-    }
-
-    req, err := http.NewRequest(method, c.FHIRUrl+"/"+endpoint, nil)
-    if err != nil {
-        return nil, err
-    }
-
-    req.Header.Set("Authorization", "Bearer "+token)
-    req.Header.Set("Accept", "application/fhir+json")
-
-    resp, err := http.DefaultClient.Do(req)
-    if err != nil {
-        return nil, err
-    }
-    defer resp.Body.Close()
-
-    if resp.StatusCode != 200 {
-        return nil, fmt.Errorf("API request failed: %d", resp.StatusCode)
-    }
-
-    body, err := io.ReadAll(resp.Body)
-    if err != nil {
-        return nil, err
-    }
-
-    var result map[string]interface{}
-    if err := json.Unmarshal(body, &result); err != nil {
-        return nil, err
-    }
-
-    return result, nil
-}
+const fhirURL = "https://playground.dhp.uz/fhir"
 
 func main() {
-    client := NewDHPClient("your_client_id", "your_client_secret")
+    // Configure OAuth2 client credentials
+    config := &clientcredentials.Config{
+        ClientID:     "your_client_id",
+        ClientSecret: "your_client_secret",
+        TokenURL:     "https://sso.dhp.uz/oauth/token",
+    }
 
-    patients, err := client.Request("GET", "Patient?_count=5")
+    // Create HTTP client with automatic token management
+    client := config.Client(context.Background())
+
+    // Make authenticated request
+    resp, err := client.Get(fhirURL + "/Patient?_count=5")
     if err != nil {
         fmt.Printf("Error: %v\n", err)
         return
     }
+    defer resp.Body.Close()
+
+    body, err := io.ReadAll(resp.Body)
+    if err != nil {
+        fmt.Printf("Error reading response: %v\n", err)
+        return
+    }
+
+    var result map[string]interface{}
+    if err := json.Unmarshal(body, &result); err != nil {
+        fmt.Printf("Error parsing JSON: %v\n", err)
+        return
+    }
 
     total := 0
-    if t, ok := patients["total"].(float64); ok {
+    if t, ok := result["total"].(float64); ok {
         total = int(t)
     }
     fmt.Printf("Found %d patients\n", total)
 
-    if entries, ok := patients["entry"].([]interface{}); ok {
+    if entries, ok := result["entry"].([]interface{}); ok {
         for _, e := range entries {
             entry := e.(map[string]interface{})
             resource := entry["resource"].(map[string]interface{})
