@@ -131,7 +131,45 @@ Accept: application/fhir+json
 
 2. **Track expiration**: Use the `expires_in` value to know when to refresh. Request a new token before the current one expires.
 
-3. **Handle token errors**: If you receive a 401 response, your token may have expired. Request a new token and retry the request.
+3. **Handle token errors**: If you receive a 401 response, your token may have expired. Refresh the token and retry the request.
+
+## Refreshing your access token
+
+When your access token expires, you can obtain a new one using the refresh token.
+
+**How the refresh token is delivered:**
+- The refresh token is returned as an HTTP-only cookie in the response from the initial `/oauth/token` request
+- It cannot be accessed by JavaScript (protection against XSS attacks)
+- It is automatically included in subsequent requests to the SSO server
+- You must ensure your HTTP client is configured to handle cookies
+
+### Refresh request
+
+- HTTP method: POST
+- Endpoint: `https://sso.dhp.uz/jwt/refresh`
+- No request body required
+- Credentials: `include` (to send the HTTP-only cookie)
+
+### Expected responses
+
+**Success (200 OK):**
+```json
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": 3600
+}
+```
+
+**Invalid or expired refresh token (401 Unauthorized):**
+```json
+{
+  "error": "invalid_token",
+  "error_description": "Refresh token is invalid or expired"
+}
+```
+
+If the refresh token is expired, you need to re-authenticate using the client credentials flow.
 
 ---
 
