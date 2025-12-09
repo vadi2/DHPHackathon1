@@ -5,7 +5,7 @@
 Goal: Learn how to authenticate your application with the DHP platform using OAuth 2.0 client credentials flow for backend service-to-service integration.
 
 - Skills: OAuth 2.0, HTTP POST requests, token management
-- SSO URL: `https://sso.dhp.uz`
+- SSO URL: `https://playground.dhp.uz/sso/api`
 - Base URL: `https://playground.dhp.uz/fhir`
 - Useful links:
   - [DHP SSO Documentation](https://wiki.dhp.uz/s/integration/doc/sso-ghGrj2qWmr)
@@ -71,7 +71,7 @@ These credentials are provided by the DHP administrator. For the connectathon, c
 ### Token request
 
 - HTTP method: POST
-- Endpoint: `https://sso.dhp.uz/oauth/token`
+- Endpoint: `https://playground.dhp.uz/sso/api/oauth/token`
 - Content-Type: `application/x-www-form-urlencoded`
 
 **Request parameters:**
@@ -146,7 +146,7 @@ When your access token expires, you can obtain a new one using the refresh token
 ### Refresh request
 
 - HTTP method: POST
-- Endpoint: `https://sso.dhp.uz/jwt/refresh`
+- Endpoint: `https://playground.dhp.uz/sso/api/jwt/refresh`
 - No request body required
 - Credentials: `include` (to send the HTTP-only cookie)
 
@@ -203,7 +203,7 @@ Below are examples of authenticating and making API calls in various programming
   <div class="tab-content">
     <div class="tab-pane active" id="curl">
 <pre><code class="language-bash"># Step 1: Get access token
-TOKEN_RESPONSE=$(curl -s -X POST "https://sso.dhp.uz/oauth/token" \
+TOKEN_RESPONSE=$(curl -s -X POST "https://playground.dhp.uz/sso/api/oauth/token" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "grant_type=client_credentials" \
   -d "client_id=your_client_id" \
@@ -226,7 +226,7 @@ from oauthlib.oauth2 import BackendApplicationClient
 from requests_oauthlib import OAuth2Session
 from fhir.resources.bundle import Bundle
 
-SSO_URL = "https://sso.dhp.uz"
+SSO_URL = "https://playground.dhp.uz/sso/api"
 FHIR_URL = "https://playground.dhp.uz/fhir"
 CLIENT_ID = "your_client_id"
 CLIENT_SECRET = "your_client_secret"
@@ -261,7 +261,7 @@ for entry in bundle.entry or []:
 <pre><code class="language-javascript">// npm install simple-oauth2
 const { ClientCredentials } = require('simple-oauth2');
 
-const SSO_URL = 'https://sso.dhp.uz';
+const SSO_URL = 'https://playground.dhp.uz/sso/api';
 const FHIR_URL = 'https://playground.dhp.uz/fhir';
 
 // Configure OAuth2 client
@@ -316,7 +316,7 @@ import com.github.scribejava.core.builder.api.DefaultApi20;
 import com.github.scribejava.core.oauth.OAuth20Service;
 
 public class DHPExample {
-    static final String SSO_URL = "https://sso.dhp.uz";
+    static final String SSO_URL = "https://playground.dhp.uz/sso/api";
     static final String FHIR_URL = "https://playground.dhp.uz/fhir";
 
     static class DHPApi extends DefaultApi20 {
@@ -370,7 +370,7 @@ using Hl7.Fhir.Model;
 using Hl7.Fhir.Rest;
 using IdentityModel.Client;
 
-const string ssoUrl = "https://sso.dhp.uz";
+const string ssoUrl = "https://playground.dhp.uz/sso/api";
 const string fhirUrl = "https://playground.dhp.uz/fhir";
 
 // Get OAuth2 token
@@ -425,7 +425,7 @@ func main() {
     config := &clientcredentials.Config{
         ClientID:     "your_client_id",
         ClientSecret: "your_client_secret",
-        TokenURL:     "https://sso.dhp.uz/oauth/token",
+        TokenURL:     "https://playground.dhp.uz/sso/api/oauth/token",
     }
 
     // Create HTTP client with automatic token management

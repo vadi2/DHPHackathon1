@@ -5,7 +5,7 @@
 Цель: Научиться аутентифицировать ваше приложение на платформе DHP с использованием потока OAuth 2.0 client credentials для межсервисной интеграции.
 
 - Навыки: OAuth 2.0, HTTP POST запросы, управление токенами
-- URL SSO: `https://sso.dhp.uz`
+- URL SSO: `https://playground.dhp.uz/sso/api`
 - Базовый URL: `https://playground.dhp.uz/fhir`
 - Полезные ссылки:
   - [Документация DHP SSO](https://wiki.dhp.uz/s/integration/doc/sso-ghGrj2qWmr)
@@ -71,7 +71,7 @@ Client credentials grant — это поток OAuth 2.0, предназначе
 ### Запрос токена
 
 - HTTP-метод: POST
-- Endpoint: `https://sso.dhp.uz/oauth/token`
+- Endpoint: `https://playground.dhp.uz/sso/api/oauth/token`
 - Content-Type: `application/x-www-form-urlencoded`
 
 **Параметры запроса:**
@@ -146,7 +146,7 @@ Accept: application/fhir+json
 ### Запрос на обновление
 
 - HTTP-метод: POST
-- Endpoint: `https://sso.dhp.uz/jwt/refresh`
+- Endpoint: `https://playground.dhp.uz/sso/api/jwt/refresh`
 - Тело запроса не требуется
 - Credentials: `include` (для отправки HTTP-only cookie)
 
@@ -203,7 +203,7 @@ Accept: application/fhir+json
   <div class="tab-content">
     <div class="tab-pane active" id="curl">
 <pre><code class="language-bash"># Шаг 1: Получение токена доступа
-TOKEN_RESPONSE=$(curl -s -X POST "https://sso.dhp.uz/oauth/token" \
+TOKEN_RESPONSE=$(curl -s -X POST "https://playground.dhp.uz/sso/api/oauth/token" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "grant_type=client_credentials" \
   -d "client_id=your_client_id" \
@@ -226,7 +226,7 @@ from oauthlib.oauth2 import BackendApplicationClient
 from requests_oauthlib import OAuth2Session
 from fhir.resources.bundle import Bundle
 
-SSO_URL = "https://sso.dhp.uz"
+SSO_URL = "https://playground.dhp.uz/sso/api"
 FHIR_URL = "https://playground.dhp.uz/fhir"
 CLIENT_ID = "your_client_id"
 CLIENT_SECRET = "your_client_secret"
@@ -261,7 +261,7 @@ for entry in bundle.entry or []:
 <pre><code class="language-javascript">// npm install simple-oauth2
 const { ClientCredentials } = require('simple-oauth2');
 
-const SSO_URL = 'https://sso.dhp.uz';
+const SSO_URL = 'https://playground.dhp.uz/sso/api';
 const FHIR_URL = 'https://playground.dhp.uz/fhir';
 
 // Настройка OAuth2 клиента
@@ -316,7 +316,7 @@ import com.github.scribejava.core.builder.api.DefaultApi20;
 import com.github.scribejava.core.oauth.OAuth20Service;
 
 public class DHPExample {
-    static final String SSO_URL = "https://sso.dhp.uz";
+    static final String SSO_URL = "https://playground.dhp.uz/sso/api";
     static final String FHIR_URL = "https://playground.dhp.uz/fhir";
 
     static class DHPApi extends DefaultApi20 {
@@ -370,7 +370,7 @@ using Hl7.Fhir.Model;
 using Hl7.Fhir.Rest;
 using IdentityModel.Client;
 
-const string ssoUrl = "https://sso.dhp.uz";
+const string ssoUrl = "https://playground.dhp.uz/sso/api";
 const string fhirUrl = "https://playground.dhp.uz/fhir";
 
 // Получение OAuth2 токена
@@ -425,7 +425,7 @@ func main() {
     config := &clientcredentials.Config{
         ClientID:     "your_client_id",
         ClientSecret: "your_client_secret",
-        TokenURL:     "https://sso.dhp.uz/oauth/token",
+        TokenURL:     "https://playground.dhp.uz/sso/api/oauth/token",
     }
 
     // Создание HTTP-клиента с автоматическим управлением токенами
